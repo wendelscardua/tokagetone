@@ -31,6 +31,7 @@ FEATURE_ARPEGGIOS = 1
 .endif
 .globalzp stream_byte
 .globalzp song_address
+.globalzp sound_bank
 
 .global sound_initialize
 .global sound_stop

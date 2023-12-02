@@ -4,7 +4,6 @@
 ; ported from llvm-mos asm code
 .global __get_prg_bank
 .global __set_prg_bank
-.globalzp sound_bank
 
 .segment "_pnmi_p200"
 soundengine_update
