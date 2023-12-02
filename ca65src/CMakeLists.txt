@@ -11,7 +11,7 @@ if (NOT ft_to_asm)
 endif()
 
 add_custom_command(
-  OUTPUT soundtrack.asm soundtrack_dpcm.asm
+  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/soundtrack.asm ${CMAKE_CURRENT_BINARY_DIR}/soundtrack_dpcm.asm
   COMMAND ${Python3_EXECUTABLE} ${ft_to_asm} ${CMAKE_SOURCE_DIR}/music/soundtrack.txt ${CMAKE_CURRENT_BINARY_DIR}/soundtrack.asm
   DEPENDS ${ft_to_asm} ${CMAKE_SOURCE_DIR}/music/soundtrack.txt
 )
@@ -34,8 +34,8 @@ add_custom_command(
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/soundtrack.o
     COMMAND ca65 --include-dir ${CMAKE_CURRENT_BINARY_DIR} -o ${CMAKE_CURRENT_BINARY_DIR}/${out} ${CMAKE_CURRENT_SOURCE_DIR}/ggsound.asm
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/soundtrack.s
-    DEPENDS ${CMAKE_BINARY_DIR}/soundtrack.asm
-    DEPENDS ${CMAKE_BINARY_DIR}/soundtrack_dpcm.asm
+    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/soundtrack.asm
+    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/soundtrack_dpcm.asm
     VERBATIM)
 
 set_target_properties(Ca65Obj PROPERTIES LINKER_LANGUAGE CXX)
