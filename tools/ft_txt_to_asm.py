@@ -30,8 +30,8 @@ instruments = []
 instrument_id_to_index = {-1: -1}
 song_tracks = []
 sfx_tracks = []
-lo_byte_operator = "@mos16lo"
-hi_byte_operator = "@mos16hi"
+lo_byte_operator = "<"
+hi_byte_operator = ">"
 define_byte_directive = "  .byte "
 define_word_directive = "  .word "
 
@@ -127,7 +127,7 @@ def generate_stream(track, order, channel, speed):
         last_note = note_info[1]
         jump_frame = note_info[2]
 
-        if track["name"].startswith("_sfx_") and note_length == len(track_rows) and instrument == -1:
+        if track["name"].startswith("_sfx_") and note_length == len(track_rows) and instrument is -1:
             #In this case, we don't want to generate any stream data. This stream is completely empty.
             break
 
@@ -621,7 +621,7 @@ def main():
             #dpcm sample lut
             f.write("dpcm_samples_list:\n")
             for dpcm_sample in dpcm_samples:
-                f.write("%s(%s >> 6)%s\n" % (define_byte_directive, dpcm_sample["name"], lo_byte_operator))
+                f.write("%s%s(%s >> 6)\n" % (define_byte_directive, lo_byte_operator, dpcm_sample["name"]))
             f.write("\n")
 
             #dpcm key tables
@@ -723,7 +723,7 @@ def main():
                 if not entire_channel_silent:
                     for order in track["orders"]:
                         stream_label = "%s_%s_%s" % (track["name"], channel, order[channel])
-                        sub_stream_calls.append("%sCAL,(%s)%s,(%s)%s\n" % (define_byte_directive, stream_label, lo_byte_operator, stream_label, hi_byte_operator))
+                        sub_stream_calls.append("%sCAL,%s(%s),%s(%s)\n" % (define_byte_directive, lo_byte_operator, stream_label, hi_byte_operator, stream_label))
                     streams.extend(channel_streams)
 
                 if len(sub_stream_calls) > 0:

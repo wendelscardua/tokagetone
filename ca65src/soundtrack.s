@@ -1,7 +1,7 @@
-        .section .dpcm,"aR",@progbits
+        .segment "_pdpcm"
         .include "soundtrack_dpcm.asm"
 
-        .section .prg_rom_2,"aR",@progbits
+        .segment "_pprg__rom__2"
         .include "ggsound.inc"
 
         .global song_list

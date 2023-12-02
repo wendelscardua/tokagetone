@@ -8,18 +8,6 @@ if (NOT GENERATE_METASPRITES)
   message(FATAL_ERROR "The generate-metasprites tool is required!")
 endif()
 
-find_package(Python3 REQUIRED)
-
-find_file(
-  ft_to_asm
-  NAMES ft_txt_to_asm.py
-  PATHS "${CMAKE_SOURCE_DIR}/tools"
-)
-
-if (NOT ft_to_asm)
-  message(FATAL_ERROR "Cannot convert soundtrack: Unable to find conversor script ft_txt_to_asm.py")
-endif()
-
 find_program(
   SOUNDTRACK_ENUMS
   soundtrack-enums
@@ -34,12 +22,6 @@ add_custom_command(
   OUTPUT metasprites.s ${CMAKE_CURRENT_BINARY_DIR}/metasprites.hpp
   COMMAND ${GENERATE_METASPRITES} generate ${CMAKE_CURRENT_BINARY_DIR}/metasprites.s ${CMAKE_CURRENT_BINARY_DIR}/metasprites.hpp ${CMAKE_SOURCE_DIR}/assets/metasprites.nss --bank .prg_rom_1 --label-prefix metasprite
   DEPENDS ${GENERATE_METASPRITES} ${CMAKE_SOURCE_DIR}/assets/metasprites.nss
-)
-
-add_custom_command(
-  OUTPUT soundtrack.asm soundtrack_dpcm.asm
-  COMMAND ${Python3_EXECUTABLE} ${ft_to_asm} ${CMAKE_SOURCE_DIR}/music/soundtrack.txt ${CMAKE_CURRENT_BINARY_DIR}/soundtrack.asm
-  DEPENDS ${ft_to_asm} ${CMAKE_SOURCE_DIR}/music/soundtrack.txt
 )
 
 add_custom_command(
@@ -59,13 +41,10 @@ add_library(SourceObj
   banked-asset-helpers.cpp
   donut.cpp
   donut.s
-  ggsound.cpp
-  ggsound.s
   log.cpp
   zx02.s
 
   assets.s
-  soundtrack.s
   soundtrack.hpp
 
   ${CMAKE_CURRENT_BINARY_DIR}/metasprites.s

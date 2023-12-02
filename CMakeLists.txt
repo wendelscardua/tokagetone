@@ -45,6 +45,7 @@ include(Assets)
 add_executable(${ROM} "")
 
 add_subdirectory(src)
+add_subdirectory(ca65src)
 
 target_link_libraries(${ROM} PRIVATE
   # Second-party, included in llvm-mos
@@ -52,4 +53,5 @@ target_link_libraries(${ROM} PRIVATE
   nesdoug
   # subdirectory stuff
   SourceObj
+  Ca65Obj
 )
