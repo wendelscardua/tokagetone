@@ -41,6 +41,7 @@ add_library(SourceObj
   banked-asset-helpers.cpp
   donut.cpp
   donut.s
+  ggsound.cpp
   log.cpp
   zx02.s
 
