@@ -25,14 +25,14 @@ add_library(Ca65Obj
 
 add_custom_command(
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/ggsound.o
-    COMMAND ca65 --include-dir ${CMAKE_CURRENT_BINARY_DIR} -o ${CMAKE_CURRENT_BINARY_DIR}/${out} ${CMAKE_CURRENT_SOURCE_DIR}/ggsound.asm
+    COMMAND ca65 --include-dir ${CMAKE_CURRENT_BINARY_DIR} -o ${CMAKE_CURRENT_BINARY_DIR}/ggsound.o ${CMAKE_CURRENT_SOURCE_DIR}/ggsound.asm
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/ggsound.asm
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/ggsound.inc
     VERBATIM)
 
 add_custom_command(
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/soundtrack.o
-    COMMAND ca65 --include-dir ${CMAKE_CURRENT_BINARY_DIR} -o ${CMAKE_CURRENT_BINARY_DIR}/${out} ${CMAKE_CURRENT_SOURCE_DIR}/ggsound.asm
+    COMMAND ca65 --include-dir ${CMAKE_CURRENT_BINARY_DIR} -o ${CMAKE_CURRENT_BINARY_DIR}/soundtrack.o ${CMAKE_CURRENT_SOURCE_DIR}/ggsound.asm
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/soundtrack.s
     DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/soundtrack.asm
     DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/soundtrack_dpcm.asm
