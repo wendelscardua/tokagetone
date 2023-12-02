@@ -2,6 +2,10 @@
 .include "ggsound.inc"
 
 ; ported from llvm-mos asm code
+.global __get_prg_bank
+.global __set_prg_bank
+.globalzp sound_bank
+
 .segment "_pnmi_p200"
 soundengine_update
 
@@ -53,6 +57,8 @@ sfx_list_address: .res 2
 song_address: .res 2
 apu_register_sets: .res 20
 
+sound_bank: .res 1
+
 .segment "BSS"
 
 stream_flags:                  .res MAX_STREAMS
@@ -85,7 +91,7 @@ stream_tempo_counter_hi:       .res MAX_STREAMS
 stream_tempo_lo:               .res MAX_STREAMS
 stream_tempo_hi:               .res MAX_STREAMS
 
-.segment "CODE"
+.segment "_pprg__rom__2"
 
 ;Expects sound_param_byte_0 to contain desired region (SOUND_REGION_NTSC, SOUND_REGION_PAL, SOUND_REGION_DENDY)
 ;Expects sound_param_word_0 to contain song list address.

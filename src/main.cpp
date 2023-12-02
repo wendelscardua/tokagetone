@@ -1,6 +1,5 @@
 #include "bank-helper.hpp"
 #include "banked-asset-helpers.hpp"
-#include "ggsound.hpp"
 #include "soundtrack-ptr.hpp"
 #include <mapper.h>
 #include <nesdoug.h>

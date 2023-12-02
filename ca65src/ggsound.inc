@@ -289,9 +289,15 @@ instrument_header_arpeggio_type = 4
 
     lda sound_disable_update
     bne sound_update_disabled
-
+    
+    jsr __get_prg_bank
+    pha
+    lda sound_bank
+    jsr __set_prg_bank
     jsr sound_update
     jsr sound_upload
+    pla
+    jsr __set_prg_bank
 
 sound_update_disabled:
 
