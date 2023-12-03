@@ -20,7 +20,7 @@ class MapParser < Thor
   desc 'usage MAP_FILE', 'Display memory usage per section'
   method_option :mapper,
                 type: :string,
-                enum: %w[action53],
+                enum: %w[action53 mmc3],
                 default: 'action53',
                 required: false
   method_option :mapper_options,
@@ -41,6 +41,9 @@ class MapParser < Thor
              when 'action53'
                banks = options[:mapper_options].fetch('banks', '1').to_i
                Layout.build_action53(banks:)
+             when 'mmc3'
+               banks = options[:mapper_options].fetch('banks', '1').to_i
+               Layout.build_mmc3(banks:)
              else
                raise NotImplementedError
              end
@@ -110,6 +113,25 @@ class MapParser < Thor
                           (0xc000 + 0x10000 * bank))
       end
 
+      areas << Area.new('PRG ROM Last', 0xc000...0x10000)
+
+      new(areas)
+    end
+
+    def self.build_mmc3(banks:)
+      areas = [
+        Area.new('Zero Page', 0x00...0x100),
+        Area.new('RAM', 0x100...0x800),
+        Area.new('WRAM', 0x6000...0x8000)
+      ]
+
+      (0...banks - 2).each do |bank|
+        areas << Area.new("PRG ROM #{bank}",
+                          (0x8000 + 0x10000 * bank)...
+                          (0xa000 + 0x10000 * bank))
+      end
+
+      areas << Area.new('PRG ROM Fix', 0xa000...0xc000)
       areas << Area.new('PRG ROM Last', 0xc000...0x10000)
 
       new(areas)
