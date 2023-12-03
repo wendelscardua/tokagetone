@@ -22,11 +22,12 @@ namespace GGSound {
     extern "C" void resume_song();
   } // namespace Wrapper
 
-  __attribute__((noinline)) void init(Region arg_region, Track *arg_song_list[],
-                                      Track *arg_sfx_list[],
-                                      void *arg_instruments[],
+  __attribute__((noinline)) void init(Region arg_region,
+                                      const Track *arg_song_list[],
+                                      const Track *arg_sfx_list[],
+                                      const void *arg_instruments[],
 #ifdef FEATURE_DPCM
-                                      void *dpcm_pointers[],
+                                      const void *dpcm_pointers[],
 #endif
                                       u8 arg_bank) {
     sound_param_byte_0 = (u8)arg_region;

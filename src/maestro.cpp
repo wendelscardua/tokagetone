@@ -1,4 +1,7 @@
 #include "maestro.hpp"
+#include "bank-helper.hpp"
+#include "ggsound.hpp"
+#include "soundtrack-ptr.hpp"
 
 __attribute__((section(
     ".prg_ram.noinit"))) volatile u8 square1_frame[Maestro::MAX_INSTRUCTIONS];
@@ -28,6 +31,16 @@ const u8 noise_stream[] = {(u8)SongOpCode::CAL, ADDR_TO_BYTES(noise_frame),
 const u8 dpcm_stream[] = {(u8)SongOpCode::CAL, ADDR_TO_BYTES(dpcm_frame),
                           (u8)SongOpCode::GOT, ADDR_TO_BYTES(dpcm_stream)};
 
+const GGSound::Track synthetic_track{6,
+                                     5,
+                                     (void *)&square1_stream[0],
+                                     (void *)&square2_stream[0],
+                                     (void *)&triangle_stream[0],
+                                     (void *)&noise_stream[0],
+                                     (void *)&dpcm_stream[0]};
+
+const GGSound::Track *synthetic_song_list[] = {&synthetic_track};
+
 Maestro::Maestro() {
   for (auto &row : rows) {
     row.square1 = row.square2 = row.triangle = row.noise = row.dpcm =
@@ -43,5 +56,11 @@ void Maestro::update_streams() {
   u8 dpcm_cursor = 0;
 
   for (auto row : rows) {
+  }
+
+  {
+    ScopedBank scopedBank(GET_BANK(instrument_list));
+    GGSound::init(GGSound::Region::NTSC, synthetic_song_list, sfx_list,
+                  instrument_list, dpcm_list, GET_BANK(song_list));
   }
 };

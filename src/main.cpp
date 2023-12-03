@@ -37,8 +37,6 @@ int main() {
 
   Maestro maestro;
 
-  banked_play_song(Song::Lalala);
-
   while (true) {
     ppu_wait_nmi();
     pad_poll(0);

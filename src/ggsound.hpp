@@ -45,10 +45,10 @@ namespace GGSound {
   };
 
   // Initialize sound engine
-  void init(Region region, Track *song_list[], Track *sfx_list[],
-            void *instruments[],
+  void init(Region region, const Track *song_list[], const Track *sfx_list[],
+            const void *instruments[],
 #ifdef FEATURE_DPCM
-            void *dpcm_pointers[],
+            const void *dpcm_pointers[],
 #endif
             u8 bank);
 
