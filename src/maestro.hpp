@@ -166,6 +166,7 @@ enum class Instrument : u8 {
   Voice3HeavyOct,
   Voice3Slide,
   Silence,
+  None, // subtle difference, Silence is a valid output
 };
 
 struct Entry {
@@ -183,7 +184,7 @@ struct Row {
 
 class Maestro {
 public:
-  static constexpr u8 MAX_ROWS = 32;
+  static constexpr u8 MAX_ROWS = 64;
   static constexpr u8 MAX_INSTRUCTIONS = 200;
   Row rows[MAX_ROWS];
   Maestro();

@@ -23,36 +23,86 @@ Maestro::Maestro() {
     row.square1 = row.square2 = row.triangle = row.noise = row.dpcm =
         Entry{SongOpCode::None, Instrument::Silence};
   }
-}
+
+  rows[0].square1 = {
+      SongOpCode::C3,
+      Instrument::Powerchord,
+  };
+  rows[4].square1 = {
+      SongOpCode::E3,
+      Instrument::Powerchord,
+  };
+  rows[8].square1 = {
+      SongOpCode::G3,
+      Instrument::Powerchord,
+  };
+  rows[10].square1 = {
+      SongOpCode::C3,
+      Instrument::Powerchord,
+  };
+};
 
 void Maestro::update_streams() {
-  u8 square1_cursor = 0;
-  u8 square2_cursor = 0;
-  u8 triangle_cursor = 0;
-  u8 noise_cursor = 0;
-  u8 dpcm_cursor = 0;
+  u8 cursor = 0;
 
+  Entry current_entry{SongOpCode::A0, Instrument::Silence};
+  u16 length = 0;
+  Instrument current_instrument = Instrument::None;
+
+  // square1
   for (auto row : rows) {
+    Entry entry = row.square1;
+    if (entry.note == SongOpCode::None) {
+      length++;
+    } else {
+      if (length > 0) {
+        if (current_entry.instrument != current_instrument) {
+          current_instrument = current_entry.instrument;
+          square1_frame[cursor++] = (u8)SongOpCode::STI;
+          square1_frame[cursor++] = (u8)current_instrument;
+        }
+        if (length < 0x10) {
+          square1_frame[cursor++] = (u8)SongOpCode::SL1 + (u8)length - 1;
+        } else {
+          square1_frame[cursor++] = (u8)SongOpCode::SLL;
+          square1_frame[cursor++] = length & 0xff;
+          if (length > 0xff) {
+            square1_frame[cursor++] = (u8)SongOpCode::SLH;
+            square1_frame[cursor++] = length >> 8;
+          }
+        }
+        square1_frame[cursor++] = (u8)current_entry.note;
+        length = 1;
+      }
+      current_entry = entry;
+    }
   }
+  if (length > 0) {
+    if (current_entry.instrument != current_instrument) {
+      current_instrument = current_entry.instrument;
+      square1_frame[cursor++] = (u8)SongOpCode::STI;
+      square1_frame[cursor++] = (u8)current_instrument;
+    }
+    if (length < 0x10) {
+      square1_frame[cursor++] = (u8)SongOpCode::SL1 + (u8)length - 1;
+    } else {
+      square1_frame[cursor++] = (u8)SongOpCode::SLL;
+      square1_frame[cursor++] = length & 0xff;
+      if (length > 0xff) {
+        square1_frame[cursor++] = (u8)SongOpCode::SLH;
+        square1_frame[cursor++] = length >> 8;
+      }
+    }
+    square1_frame[cursor++] = (u8)current_entry.note;
+    length = 0;
+  }
+  square1_frame[cursor++] = (u8)SongOpCode::RET;
 
   const u8 demo[] = {(u8)SongOpCode::STI, 22,
-                     (u8)SongOpCode::SL1, (u8)SongOpCode::A0,
-                     (u8)SongOpCode::STI, 1,
-                     (u8)SongOpCode::SL3, (u8)SongOpCode::FS4,
-                     (u8)SongOpCode::SL2, (u8)SongOpCode::C3,
-                     (u8)SongOpCode::E3,  (u8)SongOpCode::SL4,
-                     (u8)SongOpCode::C3,  (u8)SongOpCode::C3,
-                     (u8)SongOpCode::C3,  (u8)SongOpCode::DS3,
-                     (u8)SongOpCode::F3,  (u8)SongOpCode::C3,
-                     (u8)SongOpCode::C3,  (u8)SongOpCode::G3,
-                     (u8)SongOpCode::E3,  (u8)SongOpCode::SL2,
-                     (u8)SongOpCode::E3,  (u8)SongOpCode::G3,
-                     (u8)SongOpCode::SL4, (u8)SongOpCode::G3,
-                     (u8)SongOpCode::C3,  (u8)SongOpCode::SL6,
-                     (u8)SongOpCode::C3,  (u8)SongOpCode::SL2,
-                     (u8)SongOpCode::E3,  (u8)SongOpCode::RET};
+                     (u8)SongOpCode::SLL, 32,
+                     (u8)SongOpCode::A0,  (u8)SongOpCode::RET};
 
-  memcpy((void *)&square1_frame[0], (void *)&demo[0], sizeof(demo));
+  // memcpy((void *)&square1_frame[0], (void *)&demo[0], sizeof(demo));
   memcpy((void *)&square2_frame[0], (void *)&demo[0], sizeof(demo));
   memcpy((void *)&triangle_frame[0], (void *)&demo[0], sizeof(demo));
   memcpy((void *)&noise_frame[0], (void *)&demo[0], sizeof(demo));
