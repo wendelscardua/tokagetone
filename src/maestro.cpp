@@ -3,11 +3,18 @@
 #include "banked-asset-helpers.hpp"
 #include "ggsound.hpp"
 #include "soundtrack-ptr.hpp"
+#include <string.h>
 
 __attribute__((section(".prg_ram.noinit"))) volatile u8
     frame[Maestro::MAX_CHANNELS][Maestro::MAX_INSTRUCTIONS];
 
+__attribute__((section(".prg_ram.noinit"))) volatile u8
+    sfx_frame[Maestro::MAX_CHANNELS][Maestro::MAX_SFX_INSTRUCTIONS];
+
 extern const GGSound::Track *synthetic_song_list[];
+extern const GGSound::Track *synthetic_sfx_list[];
+
+extern const u8 sfx_frame_template[];
 
 Entry Row::channel_entry(GGSound::Channel channel) {
   switch (channel) {
@@ -33,6 +40,16 @@ Maestro::Maestro() {
   for (auto &row : rows) {
     row.square1 = row.square2 = row.triangle = row.noise = row.dpcm =
         Entry{SongOpCode::None, Instrument::Silence};
+  }
+  for (u8 i = 0; i < MAX_CHANNELS; i++) {
+    memcpy((void *)sfx_frame[i], (void *)sfx_frame_template,
+           MAX_SFX_INSTRUCTIONS);
+  }
+  {
+    ScopedBank scopedBank(GET_BANK(instrument_list));
+    GGSound::init(GGSound::Region::NTSC, synthetic_song_list,
+                  synthetic_sfx_list, instrument_list, dpcm_list,
+                  GET_BANK(instrument_list));
   }
 };
 
@@ -102,11 +119,6 @@ void Maestro::update_streams() {
       length = 1;
     }
     frame[(u8)channel][cursor++] = (u8)SongOpCode::RET;
-  }
-  {
-    ScopedBank scopedBank(GET_BANK(instrument_list));
-    GGSound::init(GGSound::Region::NTSC, synthetic_song_list, sfx_list,
-                  instrument_list, dpcm_list, GET_BANK(instrument_list));
   }
   banked_play_song(Song::Lalala);
 };

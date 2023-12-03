@@ -58,4 +58,88 @@
         .byte GOT
         .word synth_dpcm_stream
 
-        
+        .global synthetic_sfx_list
+        synthetic_sfx_list:
+        .word synthetic_sfx_square1_track
+        .word synthetic_sfx_square2_track
+        .word synthetic_sfx_triangle_track
+        .word synthetic_sfx_noise_track
+        .word synthetic_sfx_dpcm_track
+
+        synthetic_sfx_square1_track:
+        .byte 0, 1
+        .byte 0, 1
+        .word synth_sfx_square1_stream
+        .word 0
+        .word 0
+        .word 0
+        .word 0
+
+        synthetic_sfx_square2_track:
+        .byte 0, 1
+        .byte 0, 1
+        .word 0
+        .word synth_sfx_square2_stream
+        .word 0
+        .word 0
+        .word 0
+
+        synthetic_sfx_triangle_track:
+        .byte 0, 1
+        .byte 0, 1
+        .word 0
+        .word 0
+        .word synth_sfx_triangle_stream
+        .word 0
+        .word 0
+
+        synthetic_sfx_noise_track:
+        .byte 0, 1
+        .byte 0, 1
+        .word 0
+        .word 0
+        .word 0
+        .word synth_sfx_noise_stream
+        .word 0
+
+        synthetic_sfx_dpcm_track:
+        .byte 0, 1
+        .byte 0, 1
+        .word 0
+        .word 0
+        .word 0
+        .word 0
+        .word synth_sfx_dpcm_stream
+
+        .global sfx_frame
+
+        max_sfx_instructions = 5
+
+        synth_sfx_square1_stream:
+        .byte CAL
+        .word sfx_frame
+        .byte TRM
+
+        synth_sfx_square2_stream:
+        .byte CAL
+        .word sfx_frame + max_sfx_instructions
+        .byte TRM
+
+        synth_sfx_triangle_stream:
+        .byte CAL
+        .word sfx_frame + 2 * max_sfx_instructions
+        .byte TRM
+
+        synth_sfx_noise_stream:
+        .byte CAL
+        .word sfx_frame + 3 * max_sfx_instructions
+        .byte TRM
+
+        synth_sfx_dpcm_stream:
+        .byte CAL
+        .word sfx_frame + 4 * max_sfx_instructions
+        .byte TRM
+
+        .global sfx_frame_template
+        sfx_frame_template:
+        .byte SL8,STI,0,C3,RET

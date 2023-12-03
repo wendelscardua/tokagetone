@@ -190,6 +190,7 @@ public:
   static constexpr u8 MAX_ROWS = 64;
   static constexpr u8 MAX_CHANNELS = 5;
   static constexpr u8 MAX_INSTRUCTIONS = 200;
+  static constexpr u8 MAX_SFX_INSTRUCTIONS = 5;
   Row rows[MAX_ROWS];
   Maestro();
 
