@@ -8,26 +8,10 @@ if (NOT GENERATE_METASPRITES)
   message(FATAL_ERROR "The generate-metasprites tool is required!")
 endif()
 
-find_program(
-  SOUNDTRACK_ENUMS
-  soundtrack-enums
-  PATHS "${CMAKE_SOURCE_DIR}/tools"
-)
-
-if (NOT SOUNDTRACK_ENUMS)
-  message(FATAL_ERROR "The soundtrack-enums tool is required!")
-endif()
-
 add_custom_command(
   OUTPUT metasprites.s ${CMAKE_CURRENT_BINARY_DIR}/metasprites.hpp
   COMMAND ${GENERATE_METASPRITES} generate ${CMAKE_CURRENT_BINARY_DIR}/metasprites.s ${CMAKE_CURRENT_BINARY_DIR}/metasprites.hpp ${CMAKE_SOURCE_DIR}/assets/metasprites.nss --bank .prg_rom_1 --label-prefix metasprite
   DEPENDS ${GENERATE_METASPRITES} ${CMAKE_SOURCE_DIR}/assets/metasprites.nss
-)
-
-add_custom_command(
-  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/soundtrack.hpp
-  COMMAND ${SOUNDTRACK_ENUMS} generate ${CMAKE_CURRENT_BINARY_DIR}/soundtrack.hpp ${CMAKE_SOURCE_DIR}/music/soundtrack.txt
-  DEPENDS ${SOUNDTRACK_ENUMS} ${CMAKE_SOURCE_DIR}/music/soundtrack.txt
 )
 
 add_library(SourceObj

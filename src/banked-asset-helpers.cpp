@@ -1,7 +1,6 @@
 #include "banked-asset-helpers.hpp"
 #include "assets.hpp"
 #include "bank-helper.hpp"
-#include "donut.hpp"
 #include "zx02.hpp"
 #include <mapper.h>
 #include <neslib.h>
@@ -12,7 +11,7 @@ void banked_play_song(Song song) {
 }
 
 void banked_play_sfx(SFX sfx, GGSound::SFXPriority priority) {
-  ScopedBank scopedBank(GET_BANK(sfx_list));
+  ScopedBank scopedBank(GET_BANK(instrument_list));
   GGSound::play_sfx(sfx, priority);
 }
 

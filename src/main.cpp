@@ -1,5 +1,6 @@
 #include "bank-helper.hpp"
 #include "banked-asset-helpers.hpp"
+#include "ggsound.hpp"
 #include "maestro.hpp"
 #include <mapper.h>
 #include <nesdoug.h>
@@ -40,8 +41,20 @@ int main() {
     pad_poll(0);
     auto pad = get_pad_new(0);
     if (pad & PAD_A) {
-      banked_play_sfx(SFX::A, GGSound::SFXPriority::Two);
-      // POKE(0x4020, (u8)maestro.rows[get_frame_count() & 0x1f].square1.note);
+      maestro.dynamic_sfx(GGSound::Channel::Square_1, SongOpCode::C3,
+                          Instrument::StarPlink);
+    }
+    if (pad & PAD_B) {
+      maestro.dynamic_sfx(GGSound::Channel::Square_1, SongOpCode::E4,
+                          Instrument::StarPlink);
+    }
+    if (pad & PAD_UP) {
+      maestro.dynamic_sfx(GGSound::Channel::DPCM, SongOpCode::C3,
+                          Instrument::AEIOU);
+    }
+    if (pad & PAD_DOWN) {
+      maestro.dynamic_sfx(GGSound::Channel::DPCM, SongOpCode::DS3,
+                          Instrument::AEIOU);
     }
   }
 }

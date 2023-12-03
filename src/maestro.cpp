@@ -129,4 +129,5 @@ void Maestro::dynamic_sfx(GGSound::Channel channel, SongOpCode note,
                           Instrument instrument) {
   sfx_frame[(u8)channel][3] = (u8)note;
   sfx_frame[(u8)channel][2] = (u8)instrument;
+  banked_play_sfx((SFX)channel, GGSound::SFXPriority::Two);
 }
