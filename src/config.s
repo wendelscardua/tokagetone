@@ -7,6 +7,7 @@
         __prg_rom_size = 64
         __chr_rom_size = 0
         __chr_ram_size = 32
+        __prg_ram_size = 8
 
                                 ; Flags
         __mirroring = 1 ; horizontal mirroring

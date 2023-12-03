@@ -1,9 +1,11 @@
 #include "bank-helper.hpp"
 #include "banked-asset-helpers.hpp"
+#include "maestro.hpp"
 #include "soundtrack-ptr.hpp"
 #include <mapper.h>
 #include <nesdoug.h>
 #include <neslib.h>
+#include <peekpoke.h>
 
 static void main_init() {
   set_prg_bank(0);
@@ -33,24 +35,17 @@ int main() {
 
   ppu_on_all();
 
+  Maestro maestro;
+
+  banked_play_song(Song::Lalala);
+
   while (true) {
     ppu_wait_nmi();
     pad_poll(0);
     auto pad = get_pad_new(0);
     if (pad & PAD_A) {
       banked_play_sfx(SFX::A, GGSound::SFXPriority::Two);
-    }
-    if (pad & PAD_B) {
-      banked_play_sfx(SFX::E, GGSound::SFXPriority::Two);
-    }
-    if (pad & PAD_UP) {
-      banked_play_sfx(SFX::I, GGSound::SFXPriority::Two);
-    }
-    if (pad & PAD_DOWN) {
-      banked_play_sfx(SFX::O, GGSound::SFXPriority::Two);
-    }
-    if (pad & PAD_RIGHT) {
-      banked_play_sfx(SFX::U, GGSound::SFXPriority::Two);
+      POKE(0x4020, (u8)maestro.rows[get_frame_count() & 0x1f].square1.note);
     }
   }
 }

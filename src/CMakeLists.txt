@@ -36,6 +36,7 @@ add_library(SourceObj
   config.s
 
   main.cpp
+  maestro.cpp
 
   banked-asset-helpers.s
   banked-asset-helpers.cpp
