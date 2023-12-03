@@ -195,4 +195,6 @@ public:
   Maestro();
 
   void update_streams();
+  void dynamic_sfx(GGSound::Channel channel, SongOpCode note,
+                   Instrument instrument);
 };

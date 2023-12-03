@@ -1,8 +1,10 @@
 #include "maestro.hpp"
 #include "bank-helper.hpp"
 #include "banked-asset-helpers.hpp"
+#include "common.hpp"
 #include "ggsound.hpp"
 #include "soundtrack-ptr.hpp"
+#include "soundtrack.hpp"
 #include <string.h>
 
 __attribute__((section(".prg_ram.noinit"))) volatile u8
@@ -122,3 +124,9 @@ void Maestro::update_streams() {
   }
   banked_play_song(Song::Lalala);
 };
+
+void Maestro::dynamic_sfx(GGSound::Channel channel, SongOpCode note,
+                          Instrument instrument) {
+  sfx_frame[(u8)channel][3] = (u8)note;
+  sfx_frame[(u8)channel][2] = (u8)instrument;
+}
