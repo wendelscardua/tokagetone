@@ -48,6 +48,7 @@ void Maestro::update_streams() {
   Entry current_entry{SongOpCode::A0, Instrument::Silence};
   u16 length = 0;
   Instrument current_instrument = Instrument::None;
+  u16 current_length = 0;
 
   // square1
   for (auto row : rows) {
@@ -61,19 +62,22 @@ void Maestro::update_streams() {
           square1_frame[cursor++] = (u8)SongOpCode::STI;
           square1_frame[cursor++] = (u8)current_instrument;
         }
-        if (length < 0x10) {
-          square1_frame[cursor++] = (u8)SongOpCode::SL1 + (u8)length - 1;
-        } else {
-          square1_frame[cursor++] = (u8)SongOpCode::SLL;
-          square1_frame[cursor++] = length & 0xff;
-          if (length > 0xff) {
-            square1_frame[cursor++] = (u8)SongOpCode::SLH;
-            square1_frame[cursor++] = length >> 8;
+        if (current_length != length) {
+          current_length = length;
+          if (length < 0x10) {
+            square1_frame[cursor++] = (u8)SongOpCode::SL1 + (u8)length - 1;
+          } else {
+            square1_frame[cursor++] = (u8)SongOpCode::SLL;
+            square1_frame[cursor++] = length & 0xff;
+            if (length > 0xff) {
+              square1_frame[cursor++] = (u8)SongOpCode::SLH;
+              square1_frame[cursor++] = length >> 8;
+            }
           }
         }
         square1_frame[cursor++] = (u8)current_entry.note;
-        length = 1;
       }
+      length = 1;
       current_entry = entry;
     }
   }
@@ -83,23 +87,26 @@ void Maestro::update_streams() {
       square1_frame[cursor++] = (u8)SongOpCode::STI;
       square1_frame[cursor++] = (u8)current_instrument;
     }
-    if (length < 0x10) {
-      square1_frame[cursor++] = (u8)SongOpCode::SL1 + (u8)length - 1;
-    } else {
-      square1_frame[cursor++] = (u8)SongOpCode::SLL;
-      square1_frame[cursor++] = length & 0xff;
-      if (length > 0xff) {
-        square1_frame[cursor++] = (u8)SongOpCode::SLH;
-        square1_frame[cursor++] = length >> 8;
+    if (current_length != length) {
+      current_length = length;
+      if (length < 0x10) {
+        square1_frame[cursor++] = (u8)SongOpCode::SL1 + (u8)length - 1;
+      } else {
+        square1_frame[cursor++] = (u8)SongOpCode::SLL;
+        square1_frame[cursor++] = length & 0xff;
+        if (length > 0xff) {
+          square1_frame[cursor++] = (u8)SongOpCode::SLH;
+          square1_frame[cursor++] = length >> 8;
+        }
       }
     }
     square1_frame[cursor++] = (u8)current_entry.note;
-    length = 0;
+    length = 1;
   }
   square1_frame[cursor++] = (u8)SongOpCode::RET;
 
   const u8 demo[] = {(u8)SongOpCode::STI, 22,
-                     (u8)SongOpCode::SLL, 32,
+                     (u8)SongOpCode::SLL, 64,
                      (u8)SongOpCode::A0,  (u8)SongOpCode::RET};
 
   // memcpy((void *)&square1_frame[0], (void *)&demo[0], sizeof(demo));
