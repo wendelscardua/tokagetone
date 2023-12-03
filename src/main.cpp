@@ -8,6 +8,7 @@
 
 static void main_init() {
   set_prg_8000(0);
+  set_wram_mode(WRAM_ON);
 
   disable_irq();
 
@@ -32,6 +33,7 @@ int main() {
   ppu_on_all();
 
   Maestro maestro;
+  maestro.update_streams();
 
   while (true) {
     ppu_wait_nmi();

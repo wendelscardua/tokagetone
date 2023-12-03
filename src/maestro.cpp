@@ -1,7 +1,9 @@
 #include "maestro.hpp"
 #include "bank-helper.hpp"
+#include "banked-asset-helpers.hpp"
 #include "ggsound.hpp"
 #include "soundtrack-ptr.hpp"
+#include <string.h>
 
 __attribute__((section(
     ".prg_ram.noinit"))) volatile u8 square1_frame[Maestro::MAX_INSTRUCTIONS];
@@ -14,32 +16,7 @@ __attribute__((section(
 __attribute__((section(
     ".prg_ram.noinit"))) volatile u8 dpcm_frame[Maestro::MAX_INSTRUCTIONS];
 
-#define ADDR_TO_BYTES(addr)                                                    \
-  static_cast<u8>(((u16)(addr))), static_cast<u8>(((u16)(addr)) >> 8)
-
-const u8 square1_stream[] = {(u8)SongOpCode::CAL, ADDR_TO_BYTES(square1_frame),
-                             (u8)SongOpCode::GOT,
-                             ADDR_TO_BYTES(square1_stream)};
-const u8 square2_stream[] = {(u8)SongOpCode::CAL, ADDR_TO_BYTES(square2_frame),
-                             (u8)SongOpCode::GOT,
-                             ADDR_TO_BYTES(square2_stream)};
-const u8 triangle_stream[] = {
-    (u8)SongOpCode::CAL, ADDR_TO_BYTES(triangle_frame), (u8)SongOpCode::GOT,
-    ADDR_TO_BYTES(triangle_stream)};
-const u8 noise_stream[] = {(u8)SongOpCode::CAL, ADDR_TO_BYTES(noise_frame),
-                           (u8)SongOpCode::GOT, ADDR_TO_BYTES(noise_stream)};
-const u8 dpcm_stream[] = {(u8)SongOpCode::CAL, ADDR_TO_BYTES(dpcm_frame),
-                          (u8)SongOpCode::GOT, ADDR_TO_BYTES(dpcm_stream)};
-
-const GGSound::Track synthetic_track{6,
-                                     5,
-                                     (void *)&square1_stream[0],
-                                     (void *)&square2_stream[0],
-                                     (void *)&triangle_stream[0],
-                                     (void *)&noise_stream[0],
-                                     (void *)&dpcm_stream[0]};
-
-const GGSound::Track *synthetic_song_list[] = {&synthetic_track};
+extern const GGSound::Track *synthetic_song_list[];
 
 Maestro::Maestro() {
   for (auto &row : rows) {
@@ -58,9 +35,33 @@ void Maestro::update_streams() {
   for (auto row : rows) {
   }
 
+  const u8 demo[] = {(u8)SongOpCode::STI, 22,
+                     (u8)SongOpCode::SL1, (u8)SongOpCode::A0,
+                     (u8)SongOpCode::STI, 1,
+                     (u8)SongOpCode::SL3, (u8)SongOpCode::FS4,
+                     (u8)SongOpCode::SL2, (u8)SongOpCode::C3,
+                     (u8)SongOpCode::E3,  (u8)SongOpCode::SL4,
+                     (u8)SongOpCode::C3,  (u8)SongOpCode::C3,
+                     (u8)SongOpCode::C3,  (u8)SongOpCode::DS3,
+                     (u8)SongOpCode::F3,  (u8)SongOpCode::C3,
+                     (u8)SongOpCode::C3,  (u8)SongOpCode::G3,
+                     (u8)SongOpCode::E3,  (u8)SongOpCode::SL2,
+                     (u8)SongOpCode::E3,  (u8)SongOpCode::G3,
+                     (u8)SongOpCode::SL4, (u8)SongOpCode::G3,
+                     (u8)SongOpCode::C3,  (u8)SongOpCode::SL6,
+                     (u8)SongOpCode::C3,  (u8)SongOpCode::SL2,
+                     (u8)SongOpCode::E3,  (u8)SongOpCode::RET};
+
+  memcpy((void *)&square1_frame[0], (void *)&demo[0], sizeof(demo));
+  memcpy((void *)&square2_frame[0], (void *)&demo[0], sizeof(demo));
+  memcpy((void *)&triangle_frame[0], (void *)&demo[0], sizeof(demo));
+  memcpy((void *)&noise_frame[0], (void *)&demo[0], sizeof(demo));
+  memcpy((void *)&dpcm_frame[0], (void *)&demo[0], sizeof(demo));
+
   {
     ScopedBank scopedBank(GET_BANK(instrument_list));
     GGSound::init(GGSound::Region::NTSC, synthetic_song_list, sfx_list,
-                  instrument_list, dpcm_list, GET_BANK(song_list));
+                  instrument_list, dpcm_list, GET_BANK(instrument_list));
   }
+  banked_play_song(Song::Lalala);
 };
