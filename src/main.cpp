@@ -1,14 +1,15 @@
 #include "bank-helper.hpp"
 #include "banked-asset-helpers.hpp"
 #include "maestro.hpp"
-#include "soundtrack-ptr.hpp"
 #include <mapper.h>
 #include <nesdoug.h>
 #include <neslib.h>
 #include <peekpoke.h>
 
 static void main_init() {
-  set_prg_bank(0);
+  set_prg_8000(0);
+
+  disable_irq();
 
   ppu_off();
 
@@ -22,11 +23,6 @@ static void main_init() {
 
   set_vram_buffer();
 
-  {
-    ScopedBank scopedBank(GET_BANK(song_list));
-    GGSound::init(GGSound::Region::NTSC, song_list, sfx_list, instrument_list,
-                  dpcm_list, GET_BANK(song_list));
-  }
   load_title_assets();
 }
 
@@ -43,7 +39,7 @@ int main() {
     auto pad = get_pad_new(0);
     if (pad & PAD_A) {
       banked_play_sfx(SFX::A, GGSound::SFXPriority::Two);
-      POKE(0x4020, (u8)maestro.rows[get_frame_count() & 0x1f].square1.note);
+      // POKE(0x4020, (u8)maestro.rows[get_frame_count() & 0x1f].square1.note);
     }
   }
 }

@@ -23,12 +23,6 @@ __attribute__((noinline, section(".prg_rom_last"))) void load_title_palette() {
 }
 
 __attribute__((noinline, section(".prg_rom_0"))) void load_title_assets() {
-  vram_adr(PPU_PATTERN_TABLE_0);
-  Donut::decompress_to_ppu((void *)bg_tiles, 4096 / 64);
-
-  vram_adr(PPU_PATTERN_TABLE_1);
-  Donut::decompress_to_ppu((void *)spr_tiles, 4096 / 64);
-
   vram_adr(NAMETABLE_A);
   zx02_decompress_to_vram((void *)title_nametable, NAMETABLE_A);
   load_title_palette();

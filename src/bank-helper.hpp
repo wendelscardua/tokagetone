@@ -12,10 +12,10 @@
 template <typename Func>
 __attribute__((noinline, section(".prg_rom_last.text"))) void
 banked_lambda(char bank_id, Func lambda) {
-  char old_bank = get_prg_bank();
-  set_prg_bank(bank_id);
+  char old_bank = get_prg_8000();
+  set_prg_8000(bank_id);
   lambda();
-  set_prg_bank(old_bank);
+  set_prg_8000(old_bank);
 }
 
 class ScopedBank {
@@ -23,9 +23,9 @@ class ScopedBank {
 
 public:
   ScopedBank(u8 bank) {
-    old_bank = get_prg_bank();
-    set_prg_bank(bank);
+    old_bank = get_prg_8000();
+    set_prg_8000(bank);
   };
 
-  ~ScopedBank() { set_prg_bank(old_bank); }
+  ~ScopedBank() { set_prg_8000(old_bank); }
 };

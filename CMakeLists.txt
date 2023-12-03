@@ -10,7 +10,7 @@ set(CMAKE_ASM_FLAGS_DEBUG "-Os")
 set(CMAKE_ASM_FLAGS_MINSIZEREL "-Os -flto")
 set(CMAKE_ASM_FLAGS_RELWITHDEBINFO "-Os -flto")
 
-set(LLVM_MOS_PLATFORM nes-action53)
+set(LLVM_MOS_PLATFORM nes-mmc3)
 find_package(llvm-mos-sdk REQUIRED)
 
 project(tokagetone CXX ASM)

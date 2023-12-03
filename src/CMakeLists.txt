@@ -40,8 +40,6 @@ add_library(SourceObj
 
   banked-asset-helpers.s
   banked-asset-helpers.cpp
-  donut.cpp
-  donut.s
   ggsound.cpp
   log.cpp
   zx02.s
@@ -58,8 +56,8 @@ set_property(
   PROPERTY
   OBJECT_DEPENDS
 
-  BG.chr.donut
-  SPR.chr.donut
+  BG.chr
+  SPR.chr
   
   BG.pal
   SPR.pal
@@ -67,8 +65,8 @@ set_property(
   title.nam.zx02
 )
 
-add_donut_asset(SOURCE "BG.chr")
-add_donut_asset(SOURCE "SPR.chr")
+add_raw_asset(SOURCE "BG.chr")
+add_raw_asset(SOURCE "SPR.chr")
 
 add_raw_asset(SOURCE "BG.pal")
 add_raw_asset(SOURCE "SPR.pal")

@@ -13,6 +13,4 @@ const u8 PALETTES_BANK = 0;
 
 extern "C" const char bg_palette[];
 extern "C" const char spr_palette[];
-extern "C" const char bg_tiles[];
-extern "C" const char spr_tiles[];
 extern "C" const char title_nametable[];
