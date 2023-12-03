@@ -34,39 +34,6 @@ Maestro::Maestro() {
     row.square1 = row.square2 = row.triangle = row.noise = row.dpcm =
         Entry{SongOpCode::None, Instrument::Silence};
   }
-
-  rows[0].square1 = {
-      SongOpCode::C3,
-      Instrument::Powerchord,
-  };
-  rows[4].square1 = {
-      SongOpCode::E3,
-      Instrument::Powerchord,
-  };
-  rows[8].square1 = {
-      SongOpCode::G3,
-      Instrument::Powerchord,
-  };
-  rows[10].square1 = {
-      SongOpCode::C3,
-      Instrument::Powerchord,
-  };
-  rows[16].dpcm = {
-      SongOpCode::C3,
-      Instrument::AEIOU,
-  };
-  rows[24].dpcm = {
-      SongOpCode::E3,
-      Instrument::AEIOU,
-  };
-  rows[28].dpcm = {
-      SongOpCode::G3,
-      Instrument::AEIOU,
-  };
-  rows[30].dpcm = {
-      SongOpCode::C3,
-      Instrument::AEIOU,
-  };
 };
 
 void Maestro::update_streams() {
