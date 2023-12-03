@@ -26,15 +26,12 @@ static void main_init() {
                   dpcm_list, GET_BANK(song_list));
   }
   load_title_assets();
-  banked_play_song(Song::Lalala);
 }
 
 int main() {
   main_init();
 
   ppu_on_all();
-
-  banked_play_song(Song::Lalala);
 
   while (true) {
     ppu_wait_nmi();
