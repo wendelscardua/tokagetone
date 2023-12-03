@@ -42,7 +42,8 @@ set(ROM ${CMAKE_PROJECT_NAME}.nes)
 
 include(Assets)
 
-add_executable(${ROM} "")
+# include ca65 objects directly as a workaround - it doesn't work if they are missing, though
+add_executable(${ROM} "${CMAKE_BINARY_DIR}/ca65src/ggsound.o" "${CMAKE_BINARY_DIR}/ca65src/soundtrack.o")
 
 add_subdirectory(src)
 add_subdirectory(ca65src)
