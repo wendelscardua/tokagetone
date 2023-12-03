@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common.hpp"
+#include "ggsound.hpp"
 enum class SongOpCode : u8 {
   C0,
   CS0,
@@ -180,11 +181,14 @@ struct Row {
   Entry triangle;
   Entry noise;
   Entry dpcm;
+
+  Entry channel_entry(GGSound::Channel channel);
 };
 
 class Maestro {
 public:
   static constexpr u8 MAX_ROWS = 64;
+  static constexpr u8 MAX_CHANNELS = 5;
   static constexpr u8 MAX_INSTRUCTIONS = 200;
   Row rows[MAX_ROWS];
   Maestro();

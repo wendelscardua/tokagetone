@@ -24,35 +24,37 @@
         .word synth_noise_stream
         .word synth_dpcm_stream
 
-        .global square1_frame, square2_frame, triangle_frame, noise_frame, dpcm_frame
+        .global frame
+
+        max_instructions = 200
 
         synth_square1_stream:
         .byte CAL
-        .word square1_frame
+        .word frame
         .byte GOT
         .word synth_square1_stream
 
         synth_square2_stream:
         .byte CAL
-        .word square2_frame
+        .word frame + max_instructions
         .byte GOT
         .word synth_square2_stream
 
         synth_triangle_stream:
         .byte CAL
-        .word triangle_frame
+        .word frame + 2 * max_instructions
         .byte GOT
         .word synth_triangle_stream
 
         synth_noise_stream:
         .byte CAL
-        .word noise_frame
+        .word frame + 3 * max_instructions
         .byte GOT
         .word synth_noise_stream
 
         synth_dpcm_stream:
         .byte CAL
-        .word dpcm_frame
+        .word frame + 4 * max_instructions
         .byte GOT
         .word synth_dpcm_stream
 

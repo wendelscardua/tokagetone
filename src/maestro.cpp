@@ -3,20 +3,31 @@
 #include "banked-asset-helpers.hpp"
 #include "ggsound.hpp"
 #include "soundtrack-ptr.hpp"
-#include <string.h>
 
-__attribute__((section(
-    ".prg_ram.noinit"))) volatile u8 square1_frame[Maestro::MAX_INSTRUCTIONS];
-__attribute__((section(
-    ".prg_ram.noinit"))) volatile u8 square2_frame[Maestro::MAX_INSTRUCTIONS];
-__attribute__((section(
-    ".prg_ram.noinit"))) volatile u8 triangle_frame[Maestro::MAX_INSTRUCTIONS];
-__attribute__((section(
-    ".prg_ram.noinit"))) volatile u8 noise_frame[Maestro::MAX_INSTRUCTIONS];
-__attribute__((section(
-    ".prg_ram.noinit"))) volatile u8 dpcm_frame[Maestro::MAX_INSTRUCTIONS];
+__attribute__((section(".prg_ram.noinit"))) volatile u8
+    frame[Maestro::MAX_CHANNELS][Maestro::MAX_INSTRUCTIONS];
 
 extern const GGSound::Track *synthetic_song_list[];
+
+Entry Row::channel_entry(GGSound::Channel channel) {
+  switch (channel) {
+  case GGSound::Channel::Square_1:
+    return square1;
+    break;
+  case GGSound::Channel::Square_2:
+    return square2;
+    break;
+  case GGSound::Channel::Triangle:
+    return triangle;
+    break;
+  case GGSound::Channel::Noise:
+    return noise;
+    break;
+  case GGSound::Channel::DPCM:
+    return dpcm;
+    break;
+  }
+}
 
 Maestro::Maestro() {
   for (auto &row : rows) {
@@ -40,81 +51,91 @@ Maestro::Maestro() {
       SongOpCode::C3,
       Instrument::Powerchord,
   };
+  rows[16].dpcm = {
+      SongOpCode::C3,
+      Instrument::AEIOU,
+  };
+  rows[24].dpcm = {
+      SongOpCode::E3,
+      Instrument::AEIOU,
+  };
+  rows[28].dpcm = {
+      SongOpCode::G3,
+      Instrument::AEIOU,
+  };
+  rows[30].dpcm = {
+      SongOpCode::C3,
+      Instrument::AEIOU,
+  };
 };
 
 void Maestro::update_streams() {
-  u8 cursor = 0;
+  for (GGSound::Channel channel : (GGSound::Channel[]){
+           GGSound::Channel::Square_1, GGSound::Channel::Square_2,
+           GGSound::Channel::Triangle, GGSound::Channel::Noise,
+           GGSound::Channel::DPCM}) {
+    u8 cursor = 0;
 
-  Entry current_entry{SongOpCode::A0, Instrument::Silence};
-  u16 length = 0;
-  Instrument current_instrument = Instrument::None;
-  u16 current_length = 0;
+    Entry current_entry{SongOpCode::A0, Instrument::Silence};
+    u16 length = 0;
+    Instrument current_instrument = Instrument::None;
+    u16 current_length = 0;
 
-  // square1
-  for (auto row : rows) {
-    Entry entry = row.square1;
-    if (entry.note == SongOpCode::None) {
-      length++;
-    } else {
-      if (length > 0) {
-        if (current_entry.instrument != current_instrument) {
-          current_instrument = current_entry.instrument;
-          square1_frame[cursor++] = (u8)SongOpCode::STI;
-          square1_frame[cursor++] = (u8)current_instrument;
-        }
-        if (current_length != length) {
-          current_length = length;
-          if (length < 0x10) {
-            square1_frame[cursor++] = (u8)SongOpCode::SL1 + (u8)length - 1;
-          } else {
-            square1_frame[cursor++] = (u8)SongOpCode::SLL;
-            square1_frame[cursor++] = length & 0xff;
-            if (length > 0xff) {
-              square1_frame[cursor++] = (u8)SongOpCode::SLH;
-              square1_frame[cursor++] = length >> 8;
+    for (auto row : rows) {
+      Entry entry = row.channel_entry(channel);
+      if (entry.note == SongOpCode::None) {
+        length++;
+      } else {
+        if (length > 0) {
+          if (current_entry.instrument != current_instrument) {
+            current_instrument = current_entry.instrument;
+            frame[(u8)channel][cursor++] = (u8)SongOpCode::STI;
+            frame[(u8)channel][cursor++] = (u8)current_instrument;
+          }
+          if (current_length != length) {
+            current_length = length;
+            if (length < 0x10) {
+              frame[(u8)channel][cursor++] =
+                  (u8)SongOpCode::SL1 + (u8)length - 1;
+            } else {
+              frame[(u8)channel][cursor++] = (u8)SongOpCode::SLL;
+              frame[(u8)channel][cursor++] = length & 0xff;
+              if (length > 0xff) {
+                frame[(u8)channel][cursor++] = (u8)SongOpCode::SLH;
+                frame[(u8)channel][cursor++] = length >> 8;
+              }
             }
           }
+          frame[(u8)channel][cursor++] = (u8)current_entry.note;
         }
-        square1_frame[cursor++] = (u8)current_entry.note;
+        length = 1;
+        current_entry = entry;
       }
+    }
+    if (length > 0) {
+      if (current_entry.instrument != current_instrument) {
+        current_instrument = current_entry.instrument;
+        frame[(u8)channel][cursor++] = (u8)SongOpCode::STI;
+        frame[(u8)channel][cursor++] = (u8)current_instrument;
+      }
+      if (current_length != length) {
+        current_length = length;
+        if (length < 0x10) {
+          frame[(u8)channel][cursor++] = (u8)SongOpCode::SL1 + (u8)length - 1;
+        } else {
+          frame[(u8)channel][cursor++] = (u8)SongOpCode::SLL;
+          frame[(u8)channel][cursor++] = length & 0xff;
+          if (length > 0xff) {
+            frame[(u8)channel][cursor++] = (u8)SongOpCode::SLH;
+            frame[(u8)channel][cursor++] = length >> 8;
+          }
+        }
+      }
+      frame[(u8)channel][cursor++] = (u8)current_entry.note;
       length = 1;
-      current_entry = entry;
     }
+    frame[(u8)channel][cursor++] = (u8)SongOpCode::RET;
   }
-  if (length > 0) {
-    if (current_entry.instrument != current_instrument) {
-      current_instrument = current_entry.instrument;
-      square1_frame[cursor++] = (u8)SongOpCode::STI;
-      square1_frame[cursor++] = (u8)current_instrument;
-    }
-    if (current_length != length) {
-      current_length = length;
-      if (length < 0x10) {
-        square1_frame[cursor++] = (u8)SongOpCode::SL1 + (u8)length - 1;
-      } else {
-        square1_frame[cursor++] = (u8)SongOpCode::SLL;
-        square1_frame[cursor++] = length & 0xff;
-        if (length > 0xff) {
-          square1_frame[cursor++] = (u8)SongOpCode::SLH;
-          square1_frame[cursor++] = length >> 8;
-        }
-      }
-    }
-    square1_frame[cursor++] = (u8)current_entry.note;
-    length = 1;
-  }
-  square1_frame[cursor++] = (u8)SongOpCode::RET;
-
-  const u8 demo[] = {(u8)SongOpCode::STI, 22,
-                     (u8)SongOpCode::SLL, 64,
-                     (u8)SongOpCode::A0,  (u8)SongOpCode::RET};
-
-  // memcpy((void *)&square1_frame[0], (void *)&demo[0], sizeof(demo));
-  memcpy((void *)&square2_frame[0], (void *)&demo[0], sizeof(demo));
-  memcpy((void *)&triangle_frame[0], (void *)&demo[0], sizeof(demo));
-  memcpy((void *)&noise_frame[0], (void *)&demo[0], sizeof(demo));
-  memcpy((void *)&dpcm_frame[0], (void *)&demo[0], sizeof(demo));
-
   {
     ScopedBank scopedBank(GET_BANK(instrument_list));
     GGSound::init(GGSound::Region::NTSC, synthetic_song_list, sfx_list,

@@ -23,25 +23,31 @@ namespace GGSound {
   };
 
   enum class Channel : u8 {
-    Square_1 = 0,
-    Square_2 = 1,
-    Triangle = 2,
-    Noise = 3
+    Square_1,
+    Square_2,
+    Triangle,
+    Noise,
+#ifdef FEATURE_DPCM
+    DPCM,
+#endif
+  };
+
+  enum class Stream : u8 {
+    Square_1,
+    Square_2,
+    Triangle,
+    Noise,
+#ifdef FEATURE_DPCM
+    DPCM,
+#endif
+    SFX1,
+    SFX2
   };
 
   // doubles as a "stream" index
   enum class SFXPriority : u8 {
-    One = 4,
-    Two = 5,
-  };
-
-  enum class Stream : u8 {
-    Square_1 = 0,
-    Square_2 = 1,
-    Triangle = 2,
-    Noise = 3,
-    SFX1 = 4,
-    SFX2 = 5
+    One = (u8)Stream::SFX1,
+    Two = (u8)Stream::SFX2,
   };
 
   // Initialize sound engine
