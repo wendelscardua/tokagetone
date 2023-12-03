@@ -295,8 +295,8 @@ instrument_header_arpeggio_type = 4
     pha
     lda sound_bank
     jsr __set_prg_bank
-    jsr sound_update
-    jsr sound_upload
+    jsr .loword(sound_update)
+    jsr .loword(sound_upload)
     pla
     jsr __set_prg_bank
 

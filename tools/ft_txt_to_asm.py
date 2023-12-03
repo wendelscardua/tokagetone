@@ -127,7 +127,7 @@ def generate_stream(track, order, channel, speed):
         last_note = note_info[1]
         jump_frame = note_info[2]
 
-        if track["name"].startswith("_sfx_") and note_length == len(track_rows) and instrument is -1:
+        if track["name"].startswith("_sfx_") and note_length == len(track_rows) and instrument == -1:
             #In this case, we don't want to generate any stream data. This stream is completely empty.
             break
 
@@ -518,7 +518,7 @@ def main():
 
     #generate the asm file.
     with open(output_file, 'w') as f:
-
+        f.write(".feature force_range +\n")
         if len(song_tracks) > 0:
             #song enum
             for i in range(0, len(song_tracks)):

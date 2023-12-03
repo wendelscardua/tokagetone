@@ -169,7 +169,7 @@ nstc:
     sta base_address_note_table_hi
     lda #>ntsc_note_table_hi
     sta base_address_note_table_hi+1
-    jmp done
+    jmp .loword(done)
 pal:
     lda #<pal_note_table_lo
     sta base_address_note_table_lo
@@ -194,10 +194,10 @@ done:
     sta apu_dpcm_state
     .endif
 
-    jsr sound_initialize_apu_buffer
+    jsr .loword(sound_initialize_apu_buffer)
 
     ;Make sure all streams are killed.
-    jsr sound_stop
+    jsr .loword(sound_stop)
 
     dec sound_disable_update
 
@@ -224,7 +224,7 @@ loop:
     dex
     bpl loop
 
-    jsr sound_initialize_apu_buffer
+    jsr .loword(sound_initialize_apu_buffer)
 
     dec sound_disable_update
 
@@ -264,7 +264,7 @@ song_stream_register_copy_loop:
     beq song_stream_not_active
 
     ;Update the stream.
-    jsr stream_update
+    jsr .loword(stream_update)
 
     ;Load channel number.
     lda stream_channel,x
@@ -297,7 +297,7 @@ sfx_stream_register_copy_loop:
     beq sfx_stream_not_active
 
     ;Update the stream.
-    jsr stream_update
+    jsr .loword(stream_update)
 
     ;Load channel number
     lda stream_channel,x
@@ -491,9 +491,9 @@ arpeggio_callback_table_hi:
     pha
     lda #<(return_from_arpeggio_callback-1)
     pha
-    lda arpeggio_callback_table_hi,y
+    lda .loword(arpeggio_callback_table_hi),y
     pha
-    lda arpeggio_callback_table_lo,y
+    lda .loword(arpeggio_callback_table_lo),y
     pha
     rts
 return_from_arpeggio_callback:
@@ -559,7 +559,7 @@ skip_volume_loop:
 
 volume_stop:
 
-    jmp done
+    jmp .loword(done)
 silence_until_note:
     lda stream_channel_register_1,x
     and #%11000000
@@ -600,7 +600,7 @@ pitch_delta_positive:
     adc #0
     sta stream_channel_register_4,x
 
-    jmp pitch_delta_test_done
+    jmp .loword(pitch_delta_test_done)
 
 pitch_delta_negative:
 
@@ -677,9 +677,9 @@ square_2_play_note = square_1_play_note
     pha
     lda #<(return_from_arpeggio_callback-1)
     pha
-    lda arpeggio_callback_table_hi,y
+    lda .loword(arpeggio_callback_table_hi),y
     pha
-    lda arpeggio_callback_table_lo,y
+    lda .loword(arpeggio_callback_table_lo),y
     pha
     rts
 return_from_arpeggio_callback:
@@ -764,7 +764,7 @@ pitch_delta_positive:
     adc #0
     sta stream_channel_register_4,x
 
-    jmp pitch_delta_test_done
+    jmp .loword(pitch_delta_test_done)
 
 pitch_delta_negative:
 
@@ -809,9 +809,9 @@ pitch_stop:
     pha
     lda #<(return_from_arpeggio_callback-1)
     pha
-    lda arpeggio_callback_table_hi,y
+    lda .loword(arpeggio_callback_table_hi),y
     pha
-    lda arpeggio_callback_table_lo,y
+    lda .loword(arpeggio_callback_table_lo),y
     pha
     rts
 return_from_arpeggio_callback:
@@ -1017,13 +1017,13 @@ arpeggio_play:
     ;Advance arpeggio offset.
     inc stream_arpeggio_offset,x
 
-    jmp done
+    jmp .loword(done)
 arpeggio_stop:
 
     ;Just load the current note.
     ldy stream_note,x
 
-    jmp done
+    jmp .loword(done)
 arpeggio_loop:
 
     ;We hit a loop opcode, advance envelope index and load loop point.
@@ -1073,7 +1073,7 @@ arpeggio_play:
     ;Advance arpeggio offset.
     inc stream_arpeggio_offset,x
 
-    jmp done
+    jmp .loword(done)
 arpeggio_stop:
 
     ;When a fixed arpeggio is done, we're changing notes to the
@@ -1091,7 +1091,7 @@ skip_clear_pitch_loaded:
     ;Just load the current note.
     ldy stream_note,x
 
-    jmp done
+    jmp .loword(done)
 arpeggio_loop:
 
     ;We hit a loop opcode, advance envelope index and load loop point.
@@ -1145,13 +1145,13 @@ skip:
     ;Advance arpeggio offset.
     inc stream_arpeggio_offset,x
 
-    jmp done
+    jmp .loword(done)
 arpeggio_stop:
 
     ;Just load the current note.
     ldy stream_note,x
 
-    jmp done
+    jmp .loword(done)
 arpeggio_loop:
 
     ;We hit a loop opcode, advance envelope index and load loop point.
@@ -1409,7 +1409,7 @@ not_sound_effect:
 
     ;Select header tempo offset based on region.
     ldx sound_region
-    lda sound_region_to_tempo_offset,x
+    lda .loword(sound_region_to_tempo_offset),x
     sta sound_local_byte_0
 
     ;Get song address from song list.
@@ -1424,7 +1424,7 @@ not_sound_effect:
 
     ;Load square 1 stream.
     ldx #0
-    jsr stream_stop
+    jsr .loword(stream_stop)
 
     ldy #track_header_square1_stream_address
     lda (song_address),y
@@ -1440,7 +1440,7 @@ not_sound_effect:
     lda #0
     sta sound_param_byte_1
 
-    jsr stream_initialize
+    jsr .loword(stream_initialize)
 
     clc
     lda #track_header_ntsc_tempo_lo
@@ -1458,7 +1458,7 @@ no_square_1:
 
     ;Load square 2 stream.
     ldx #1
-    jsr stream_stop
+    jsr .loword(stream_stop)
 
     ldy #track_header_square2_stream_address
     lda (song_address),y
@@ -1474,7 +1474,7 @@ no_square_1:
     lda #1
     sta sound_param_byte_1
 
-    jsr stream_initialize
+    jsr .loword(stream_initialize)
 
     clc
     lda #track_header_ntsc_tempo_lo
@@ -1492,7 +1492,7 @@ no_square_2:
 
     ;Load triangle stream.
     ldx #2
-    jsr stream_stop
+    jsr .loword(stream_stop)
 
     ldy #track_header_triangle_stream_address
     lda (song_address),y
@@ -1508,7 +1508,7 @@ no_square_2:
     lda #2
     sta sound_param_byte_1
 
-    jsr stream_initialize
+    jsr .loword(stream_initialize)
 
     clc
     lda #track_header_ntsc_tempo_lo
@@ -1526,7 +1526,7 @@ no_triangle:
 
     ;Load noise stream.
     ldx #3
-    jsr stream_stop
+    jsr .loword(stream_stop)
 
     ldy #track_header_noise_stream_address
     lda (song_address),y
@@ -1542,7 +1542,7 @@ no_triangle:
     lda #3
     sta sound_param_byte_1
 
-    jsr stream_initialize
+    jsr .loword(stream_initialize)
 
     clc
     lda #track_header_ntsc_tempo_lo
@@ -1561,7 +1561,7 @@ no_noise:
     .ifdef FEATURE_DPCM
     ;Load dpcm stream.
     ldx #4
-    jsr stream_stop
+    jsr .loword(stream_stop)
 
     ldy #track_header_dpcm_stream_address
     lda (song_address),y
@@ -1577,7 +1577,7 @@ no_noise:
     lda #4
     sta sound_param_byte_1
 
-    jsr stream_initialize
+    jsr .loword(stream_initialize)
 
     lda #DPCM_STATE_NOP
     sta apu_dpcm_state
@@ -1631,7 +1631,7 @@ no_dpcm:
 
     ;Select header tempo offset based on region.
     ldx sound_region
-    lda sound_region_to_tempo_offset,x
+    lda .loword(sound_region_to_tempo_offset),x
     sta sound_local_byte_1
 
     ;Get sfx address from sfx list.
@@ -1662,7 +1662,7 @@ no_dpcm:
     lda sound_local_byte_0
     sta sound_param_byte_1
 
-    jsr stream_initialize
+    jsr .loword(stream_initialize)
 
     ldx sound_local_byte_0
     clc
@@ -1683,7 +1683,7 @@ no_square_1:
     lda sound_local_byte_0
     cmp #(soundeffect_two + 1)
     bne skip0
-    jmp no_more_sfx_streams_available
+    jmp .loword(no_more_sfx_streams_available)
 skip0:
 
     ;Load square 2 stream.
@@ -1701,7 +1701,7 @@ skip0:
     lda sound_local_byte_0
     sta sound_param_byte_1
 
-    jsr stream_initialize
+    jsr .loword(stream_initialize)
 
     ldx sound_local_byte_0
     clc
@@ -1722,7 +1722,7 @@ no_square_2:
     lda sound_local_byte_0
     cmp #(soundeffect_two + 1)
     bne skip1
-    jmp no_more_sfx_streams_available
+    jmp .loword(no_more_sfx_streams_available)
 skip1:
 
     ;Load triangle stream.
@@ -1740,7 +1740,7 @@ skip1:
     lda sound_local_byte_0
     sta sound_param_byte_1
 
-    jsr stream_initialize
+    jsr .loword(stream_initialize)
 
     ldx sound_local_byte_0
     clc
@@ -1777,7 +1777,7 @@ no_triangle:
     lda sound_local_byte_0
     sta sound_param_byte_1
 
-    jsr stream_initialize
+    jsr .loword(stream_initialize)
 
     ldx sound_local_byte_0
     clc
@@ -1811,7 +1811,7 @@ no_noise:
     lda sound_local_byte_0
     sta sound_param_byte_1
 
-    jsr stream_initialize
+    jsr .loword(stream_initialize)
 
     ldx sound_local_byte_0
     clc
@@ -2014,12 +2014,12 @@ process_opcode:
     sbc #OPCODES_BASE
     tay
     ;Get the address.
-    lda stream_callback_table_lo,y
+    lda .loword(stream_callback_table_lo),y
     sta callback_address
-    lda stream_callback_table_hi,y
+    lda .loword(stream_callback_table_hi),y
     sta callback_address+1
     ;Call the callback!
-    jsr indirect_jsr_callback_address
+    jsr .loword(indirect_jsr_callback_address)
 
     ;Advance the stream's read address.
     advance_stream_read_address
@@ -2031,20 +2031,20 @@ process_opcode:
     ;control opcode "terminate" work? It works by pulling the current return
     ;address off the stack and then performing an rts, effectively returning
     ;from its caller, this routine.
-    jmp stream_update
+    jmp .loword(stream_update)
 
 process_note:
 
     ;Determine which channel callback to use.
     lda stream_channel,x
     tay
-    lda channel_callback_table_lo,y
+    lda .loword(channel_callback_table_lo),y
     sta callback_address
-    lda channel_callback_table_hi,y
+    lda .loword(channel_callback_table_hi),y
     sta callback_address+1
 
     ;Call the channel callback!
-    jsr indirect_jsr_callback_address
+    jsr .loword(indirect_jsr_callback_address)
 
     sec
     lda stream_tempo_counter_lo,x
@@ -2225,7 +2225,7 @@ note_length_counter_not_zero:
     lda apu_data_ready
     beq apu_data_not_ready
 
-    jsr sound_upload_apu_register_sets
+    jsr .loword(sound_upload_apu_register_sets)
 
 apu_data_not_ready:
 
@@ -2292,18 +2292,18 @@ noise:
     ;a DPCM sound effect to override the currenty playing music DPCM sample until finished.
 dpcm:
     ldx apu_dpcm_state
-    lda dpcm_state_callback_hi,x
+    lda .loword(dpcm_state_callback_hi),x
     pha
-    lda dpcm_state_callback_lo,x
+    lda .loword(dpcm_state_callback_lo),x
     pha
     rts
 dpcm_upload:
-    jsr dpcm_upload_registers
+    jsr .loword(dpcm_upload_registers)
     lda #DPCM_STATE_NOP
     sta apu_dpcm_state
     rts
 dpcm_upload_then_wait:
-    jsr dpcm_upload_registers
+    jsr .loword(dpcm_upload_registers)
     lda #DPCM_STATE_WAIT
     sta apu_dpcm_state
     rts
