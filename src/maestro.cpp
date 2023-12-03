@@ -43,12 +43,12 @@ Maestro::Maestro() {
     row.square1 = row.square2 = row.triangle = row.noise = row.dpcm =
         Entry{SongOpCode::None, Instrument::Silence};
   }
-  for (u8 i = 0; i < MAX_CHANNELS; i++) {
-    memcpy((void *)sfx_frame[i], (void *)sfx_frame_template,
-           MAX_SFX_INSTRUCTIONS);
-  }
   {
     ScopedBank scopedBank(GET_BANK(instrument_list));
+    for (u8 i = 0; i < MAX_CHANNELS; i++) {
+      memcpy((void *)&sfx_frame[i][0], (void *)&sfx_frame_template[0],
+             MAX_SFX_INSTRUCTIONS);
+    }
     GGSound::init(GGSound::Region::NTSC, synthetic_song_list,
                   synthetic_sfx_list, instrument_list, dpcm_list,
                   GET_BANK(instrument_list));
