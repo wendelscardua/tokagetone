@@ -290,15 +290,15 @@ instrument_header_arpeggio_type = 4
 
     lda sound_disable_update
     bne sound_update_disabled
-    
-    jsr __get_prg_bank
+    .global get_prg_8000, set_prg_8000    
+    jsr get_prg_8000
     pha
     lda sound_bank
-    jsr __set_prg_bank
+    jsr set_prg_8000
     jsr .loword(sound_update)
     jsr .loword(sound_upload)
     pla
-    jsr __set_prg_bank
+    jsr set_prg_8000
 
 sound_update_disabled:
 
