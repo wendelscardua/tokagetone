@@ -6,6 +6,9 @@
 
     .global title_nametable
     title_nametable: .incbin "title.nam.zx02"
+    
+    .global music_editor_nametable
+    music_editor_nametable: .incbin "music-editor.nam.zx02"
 
     .section .chr_rom,"aR",@progbits
     .incbin "BG.chr"

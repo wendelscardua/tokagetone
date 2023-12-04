@@ -1,11 +1,13 @@
-#include "bank-helper.hpp"
-#include "banked-asset-helpers.hpp"
-#include "ggsound.hpp"
+#include "common.hpp"
 #include "maestro.hpp"
+#include "music-editor.hpp"
+#include "title-screen.hpp"
 #include <mapper.h>
 #include <nesdoug.h>
 #include <neslib.h>
 #include <peekpoke.h>
+
+GameState current_game_state;
 
 static void main_init() {
   set_prg_8000(0);
@@ -25,7 +27,7 @@ static void main_init() {
 
   set_vram_buffer();
 
-  load_title_assets();
+  current_game_state = GameState::TitleScreen;
 }
 
 int main() {
@@ -34,27 +36,19 @@ int main() {
   ppu_on_all();
 
   Maestro maestro;
+
   maestro.update_streams();
 
   while (true) {
-    ppu_wait_nmi();
-    pad_poll(0);
-    auto pad = get_pad_new(0);
-    if (pad & PAD_A) {
-      maestro.dynamic_sfx(GGSound::Channel::Square_1, SongOpCode::C3,
-                          Instrument::StarPlink);
-    }
-    if (pad & PAD_B) {
-      maestro.dynamic_sfx(GGSound::Channel::Square_1, SongOpCode::E4,
-                          Instrument::StarPlink);
-    }
-    if (pad & PAD_UP) {
-      maestro.dynamic_sfx(GGSound::Channel::DPCM, SongOpCode::C3,
-                          Instrument::AEIOU);
-    }
-    if (pad & PAD_DOWN) {
-      maestro.dynamic_sfx(GGSound::Channel::DPCM, SongOpCode::DS3,
-                          Instrument::AEIOU);
+    switch (current_game_state) {
+    case GameState::TitleScreen: {
+      TitleScreen title_screen;
+      title_screen.loop();
+    } break;
+    case GameState::MusicEditor: {
+      MusicEditor music_editor{maestro};
+      music_editor.loop();
+    } break;
     }
   }
 }

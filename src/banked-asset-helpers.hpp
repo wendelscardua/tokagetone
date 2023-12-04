@@ -16,3 +16,6 @@ extern "C" void banked_oam_meta_spr_horizontal(int x, char y, const void *data);
 
 // [assets bank] loads title assets
 void load_title_assets();
+
+// [assets bank] loads music editor assets
+void load_music_editor_assets();

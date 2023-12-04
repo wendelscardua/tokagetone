@@ -21,6 +21,8 @@ add_library(SourceObj
 
   main.cpp
   maestro.cpp
+  title-screen.cpp
+  music-editor.cpp
 
   banked-asset-helpers.s
   banked-asset-helpers.cpp
@@ -47,6 +49,7 @@ set_property(
   SPR.pal
   
   title.nam.zx02
+  music-editor.nam.zx02
 )
 
 add_raw_asset(SOURCE "BG.chr")
@@ -55,6 +58,7 @@ add_raw_asset(SOURCE "SPR.chr")
 add_raw_asset(SOURCE "BG.pal")
 add_raw_asset(SOURCE "SPR.pal")
 add_zx02_asset(SOURCE "title.nam")
+add_zx02_asset(SOURCE "music-editor.nam")
 
 set_property(
   SOURCE
