@@ -7,7 +7,12 @@
 #include <nesdoug.h>
 #include <neslib.h>
 
-MusicEditor::MusicEditor(Maestro &maestro) : maestro(maestro) {
+MusicEditor::MusicEditor(Maestro &maestro)
+    : maestro(maestro), current_row(0),
+      current_channel(GGSound::Channel::Square_1),
+      note{SongOpCode::C3, SongOpCode::C3, SongOpCode::C3, SongOpCode::C3,
+           SongOpCode::C3},
+      instrument_index{0, 0, 0, 0, 0}, x_scroll(0) {
   load_music_editor_assets();
 
   pal_bright(0);
@@ -134,13 +139,6 @@ const u8 note_height[] = {
 };
 
 void MusicEditor::loop() {
-  u8 current_row = 0;
-  GGSound::Channel current_channel = GGSound::Channel::Square_1;
-  SongOpCode note[Maestro::MAX_CHANNELS];
-  u8 instrument_index[] = {0, 0, 0, 0, 0};
-
-  s16 x_scroll = 0;
-
   while (current_game_state == GameState::MusicEditor) {
     ppu_wait_nmi();
 
@@ -160,28 +158,31 @@ void MusicEditor::loop() {
       }
     }
 
-    s16 x_position = 0x28 + current_row * 0x10;
-    u8 y_position = note_height[(u8)note[(u8)current_channel]];
-    void *metasprite;
-    switch (current_channel) {
-    case GGSound::Channel::Square_1:
-      metasprite = (void *)metasprite_square1_cursor;
-      break;
-    case GGSound::Channel::Square_2:
-      metasprite = (void *)metasprite_square2_cursor;
-      break;
-    case GGSound::Channel::Triangle:
-      metasprite = (void *)metasprite_triangle_cursor;
-      break;
-    case GGSound::Channel::Noise:
-      metasprite = (void *)metasprite_noise_cursor;
-      break;
-    case GGSound::Channel::DPCM:
-      metasprite = (void *)metasprite_dpcm_cursor;
-      break;
-    }
-    banked_oam_meta_spr_horizontal(x_position - x_scroll, y_position,
-                                   metasprite);
-    oam_hide_rest();
+    render_sprites();
   }
+}
+
+void MusicEditor::render_sprites() {
+  s16 x_position = 0x28 + current_row * 0x10;
+  u8 y_position = note_height[(u8)note[(u8)current_channel]];
+  void *metasprite;
+  switch (current_channel) {
+  case GGSound::Channel::Square_1:
+    metasprite = (void *)metasprite_square1_cursor;
+    break;
+  case GGSound::Channel::Square_2:
+    metasprite = (void *)metasprite_square2_cursor;
+    break;
+  case GGSound::Channel::Triangle:
+    metasprite = (void *)metasprite_triangle_cursor;
+    break;
+  case GGSound::Channel::Noise:
+    metasprite = (void *)metasprite_noise_cursor;
+    break;
+  case GGSound::Channel::DPCM:
+    metasprite = (void *)metasprite_dpcm_cursor;
+    break;
+  }
+  banked_oam_meta_spr_horizontal(x_position - x_scroll, y_position, metasprite);
+  oam_hide_rest();
 }
