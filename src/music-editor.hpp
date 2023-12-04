@@ -9,5 +9,4 @@ public:
   MusicEditor(Maestro &maestro);
   ~MusicEditor();
   void loop();
-  void render_sprites();
 };
