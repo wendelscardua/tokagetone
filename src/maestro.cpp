@@ -122,7 +122,6 @@ void Maestro::update_streams() {
     }
     frame[(u8)channel][cursor++] = (u8)SongOpCode::RET;
   }
-  banked_play_song(Song::Lalala);
 };
 
 void Maestro::dynamic_sfx(GGSound::Channel channel, SongOpCode note,

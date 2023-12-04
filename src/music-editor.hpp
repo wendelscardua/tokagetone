@@ -13,6 +13,7 @@ class MusicEditor {
   s16 x_scroll;
 
   void render_sprites();
+  void play_note();
 
 public:
   MusicEditor(Maestro &maestro);

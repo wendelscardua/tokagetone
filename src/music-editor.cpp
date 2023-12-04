@@ -38,6 +38,17 @@ const Instrument triangle_instruments[] = {Instrument::TriangleSnare,
                                            Instrument::BassKick};
 const Instrument noise_instruments[] = {
     Instrument::KickHatsCombo, Instrument::SnareHatsCombo, Instrument::HiHats};
+const Instrument dpcm_instruments[] = {Instrument::AEIOU};
+
+const Instrument *instruments[] = {
+    (Instrument *)&square_instruments[0], (Instrument *)&square_instruments[0],
+    (Instrument *)&triangle_instruments[0], (Instrument *)&noise_instruments[0],
+    (Instrument *)&dpcm_instruments[0]};
+
+const u8 max_instruments[] = {
+    sizeof(square_instruments), sizeof(square_instruments),
+    sizeof(triangle_instruments), sizeof(noise_instruments),
+    sizeof(dpcm_instruments)};
 
 const u8 note_height[] = {
     0xc0, // C0
@@ -146,7 +157,6 @@ void MusicEditor::loop() {
 
     u8 pressed = get_pad_new(0);
     if (pressed & (PAD_A | PAD_START)) {
-      maestro.update_streams();
       maestro.dynamic_sfx(GGSound::Channel::DPCM, SongOpCode::C3,
                           Instrument::AEIOU);
     }
@@ -156,10 +166,56 @@ void MusicEditor::loop() {
       } else {
         current_channel = (GGSound::Channel)(((u8)current_channel) + 1);
       }
+      play_note();
+    }
+    if (pressed & (PAD_UP)) {
+      if (note[(u8)current_channel] == SongOpCode::B7) {
+        note[(u8)current_channel] = SongOpCode::C0;
+      } else {
+        note[(u8)current_channel] =
+            (SongOpCode)((u8)note[(u8)current_channel] + 1);
+      }
+      play_note();
+    }
+    if (pressed & (PAD_DOWN)) {
+      if (note[(u8)current_channel] == SongOpCode::C0) {
+        note[(u8)current_channel] = SongOpCode::B7;
+      } else {
+        note[(u8)current_channel] =
+            (SongOpCode)((u8)note[(u8)current_channel] - 1);
+      }
+      play_note();
+    }
+    if (pressed & (PAD_LEFT)) {
+      if (current_row > 0) {
+        current_row--;
+      }
+      play_note();
+    }
+    if (pressed & (PAD_RIGHT)) {
+      if (current_row < Maestro::MAX_ROWS - 1) {
+        current_row++;
+      }
+      play_note();
+    }
+
+    if (pressed & (PAD_SELECT)) {
+      instrument_index[(u8)current_channel]++;
+      if (instrument_index[(u8)current_channel] ==
+          max_instruments[(u8)current_channel]) {
+        instrument_index[(u8)current_channel] = 0;
+      }
+      play_note();
     }
 
     render_sprites();
   }
+}
+
+void MusicEditor::play_note() {
+  maestro.dynamic_sfx(
+      current_channel, note[(u8)current_channel],
+      instruments[(u8)current_channel][instrument_index[(u8)current_channel]]);
 }
 
 void MusicEditor::render_sprites() {

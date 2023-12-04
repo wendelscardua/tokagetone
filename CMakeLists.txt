@@ -23,7 +23,7 @@ add_compile_options(
 
 add_link_options(
   -g -gdwarf-4
-  -mreserve-zp=74
+  -mreserve-zp=75
   # ggsound: 60, zx02: 7
 
   # make functions non-recursive by default
