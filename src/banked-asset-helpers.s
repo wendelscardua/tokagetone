@@ -14,10 +14,10 @@ banked_oam_meta_spr:
   sta __rc6
   stx __rc7
 
-  jsr get_prg_bank
+  jsr get_prg_8000
   pha
   lda #mos24bank(metasprite_square1_cursor)
-  jsr set_prg_bank
+  jsr set_prg_8000
 
   ldx SPRID
   ldy #0
@@ -77,7 +77,7 @@ banked_oam_meta_spr:
 2:
   stx SPRID
   pla
-  jsr set_prg_bank
+  jsr set_prg_8000
   rts
 
 
@@ -95,10 +95,10 @@ banked_oam_meta_spr_horizontal:
   sta __rc6
   stx __rc7
 
-  jsr get_prg_bank
+  jsr get_prg_8000
   pha
   lda #mos24bank(metasprite_square1_cursor)
-  jsr set_prg_bank
+  jsr set_prg_8000
 
   ldx SPRID
   ldy #0
@@ -156,5 +156,5 @@ banked_oam_meta_spr_horizontal:
 2:
   stx SPRID
   pla
-  jsr set_prg_bank
+  jsr set_prg_8000
   rts
