@@ -284,24 +284,4 @@ instrument_header_arpeggio_type = 4
 
 .endmacro
 
-;this macro updates the sound engine. It is intended to
-;be used at the end of an nmi routine, after ppu synchronization.
-.macro soundengine_update
-
-    lda sound_disable_update
-    bne sound_update_disabled
-    .global get_prg_8000, set_prg_8000    
-    jsr get_prg_8000
-    pha
-    lda sound_bank
-    jsr set_prg_8000
-    jsr .loword(sound_update)
-    jsr .loword(sound_upload)
-    pla
-    jsr set_prg_8000
-
-sound_update_disabled:
-
-.endmacro
-
 .endif

@@ -2,11 +2,20 @@
 .include "ggsound.inc"
 
 ; ported from llvm-mos asm code
-.global __get_prg_bank
-.global __set_prg_bank
 
 .segment "_pnmi_p200"
-soundengine_update
+    lda sound_disable_update
+    bne sound_update_disabled
+    .global get_prg_8000, set_prg_8000    
+    jsr get_prg_8000
+    pha
+    lda sound_bank
+    jsr set_prg_8000
+    jsr .loword(sound_update)
+    jsr .loword(sound_upload)
+    pla
+    jsr set_prg_8000
+sound_update_disabled:
 
 .segment "_pinit_p200"
 lda #1
