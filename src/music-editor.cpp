@@ -245,8 +245,27 @@ void MusicEditor::loop() {
       play_note();
     }
 
-    s16 cursor_x = 0x8 + 0x10 * Camera::music_margin + current_row * 0x10;
-    u8 cursor_y = 0x7 + note_height[(u8)note[(u8)current_channel]];
+    s16 cursor_x = 0x10 * Camera::music_margin + current_row * 0x10;
+    u8 cursor_y = note_height[(u8)note[(u8)current_channel]];
+    switch (current_channel) {
+    case GGSound::Channel::Square_1:
+    case GGSound::Channel::Square_2:
+      cursor_x += 0x4;
+      cursor_y += 0x4;
+      break;
+    case GGSound::Channel::Triangle:
+      cursor_x += 0xc;
+      cursor_y += 0x4;
+      break;
+    case GGSound::Channel::Noise:
+      cursor_x += 0x4;
+      cursor_y += 0xc;
+      break;
+    case GGSound::Channel::DPCM:
+      cursor_x += 0xc;
+      cursor_y += 0xc;
+      break;
+    }
 
     Camera::update(cursor_x, true);
     load_strip(Camera::min_horizontal_strip(), false);
