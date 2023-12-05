@@ -10,7 +10,7 @@
 MusicEditor::MusicEditor(Maestro &maestro)
     : maestro(maestro), current_row(0),
       current_channel(GGSound::Channel::Square_1),
-      note{SongOpCode::C3, SongOpCode::C3, SongOpCode::C3, SongOpCode::C3,
+      note{SongOpCode::C3, SongOpCode::C3, SongOpCode::C4, (SongOpCode)0x00,
            SongOpCode::C3},
       instrument_index{0, 0, 0, 0, 0}, x_scroll(0) {
   load_music_editor_assets();

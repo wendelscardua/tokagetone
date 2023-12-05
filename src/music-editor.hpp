@@ -3,6 +3,13 @@
 #include "maestro.hpp"
 
 class MusicEditor {
+  static constexpr SongOpCode MIN_NOTE_PER_CHANNEL[] = {
+      SongOpCode::C0, SongOpCode::C0, SongOpCode::C0, (SongOpCode)0x00,
+      SongOpCode::C3};
+  static constexpr SongOpCode MAX_NOTE_PER_CHANNEL[] = {
+      SongOpCode::B7, SongOpCode::B7, SongOpCode::B7, (SongOpCode)0x0f,
+      SongOpCode::G3};
+
   Maestro &maestro;
 
   u8 current_row;
