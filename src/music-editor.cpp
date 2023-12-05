@@ -170,8 +170,9 @@ void MusicEditor::loop() {
       play_note();
     }
     if (pressed & (PAD_UP)) {
-      if (note[(u8)current_channel] == SongOpCode::B7) {
-        note[(u8)current_channel] = SongOpCode::C0;
+      if (note[(u8)current_channel] ==
+          MAX_NOTE_PER_CHANNEL[(u8)current_channel]) {
+        note[(u8)current_channel] = MIN_NOTE_PER_CHANNEL[(u8)current_channel];
       } else {
         note[(u8)current_channel] =
             (SongOpCode)((u8)note[(u8)current_channel] + 1);
@@ -179,8 +180,9 @@ void MusicEditor::loop() {
       play_note();
     }
     if (pressed & (PAD_DOWN)) {
-      if (note[(u8)current_channel] == SongOpCode::C0) {
-        note[(u8)current_channel] = SongOpCode::B7;
+      if (note[(u8)current_channel] ==
+          MIN_NOTE_PER_CHANNEL[(u8)current_channel]) {
+        note[(u8)current_channel] = MAX_NOTE_PER_CHANNEL[(u8)current_channel];
       } else {
         note[(u8)current_channel] =
             (SongOpCode)((u8)note[(u8)current_channel] - 1);
