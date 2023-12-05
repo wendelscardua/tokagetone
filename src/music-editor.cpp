@@ -180,11 +180,18 @@ void MusicEditor::loop() {
       banked_play_song(Song::Synthetic);
     }
     if (pressed & (PAD_A)) {
-      maestro.rows[current_row].channel_entry(current_channel) = {
+      const Entry new_entry = {
           note[(u8)current_channel],
           instruments[(u8)current_channel]
                      [instrument_index[(u8)current_channel]],
       };
+      Entry &current_entry =
+          maestro.rows[current_row].channel_entry(current_channel);
+      if (current_entry == new_entry) {
+        current_entry = {SongOpCode::None, Instrument::None};
+      } else {
+        current_entry = new_entry;
+      }
       load_strip(Camera::music_margin + current_row, true);
       play_note();
     }
@@ -335,7 +342,8 @@ void MusicEditor::load_strip(s16 strip, bool force) {
 
     if (HAS_NOTE(square2)) {
       tile_index = TILE_INDEX(square2);
-      if (first_column[tile_index] == 0x63) {
+      if (first_column[tile_index] == 0x61) {
+        first_column[tile_index] = 0x63;
       } else {
         first_column[tile_index] = 0x62;
       }

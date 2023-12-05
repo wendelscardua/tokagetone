@@ -173,6 +173,10 @@ enum class Instrument : u8 {
 struct Entry {
   SongOpCode note;
   Instrument instrument;
+
+  bool operator==(Entry other) {
+    return note == other.note && instrument == other.instrument;
+  }
 };
 
 struct Row {
