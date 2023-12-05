@@ -172,6 +172,7 @@ void MusicEditor::loop() {
 
   u8 old_held = 0;
   u8 held_counter = 0;
+  u8 held_meta_counter = 0;
 
   while (current_game_state == GameState::MusicEditor) {
     ppu_wait_nmi();
@@ -185,10 +186,14 @@ void MusicEditor::loop() {
     if (held != old_held) {
       old_held = held;
       held_counter = 0;
+      held_meta_counter = 0;
     } else {
       held_counter++;
       if (held_counter >= 16) {
-        held_counter = 4;
+        held_counter = held_meta_counter;
+        if (held_meta_counter < 16) {
+          held_meta_counter++;
+        }
         pressed |= held;
       }
     }
