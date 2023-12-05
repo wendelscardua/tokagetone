@@ -20,7 +20,7 @@ class MusicEditor {
 
   void render_sprites(s16 cursor_x, u8 cursor_y);
   void play_note();
-  void load_strip(s16 strip);
+  void load_strip(s16 strip, bool force);
 
 public:
   MusicEditor(Maestro &maestro);
