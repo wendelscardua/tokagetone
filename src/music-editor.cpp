@@ -1,5 +1,6 @@
 #include "music-editor.hpp"
 #include "banked-asset-helpers.hpp"
+#include "camera.hpp"
 #include "common.hpp"
 #include "ggsound.hpp"
 #include "maestro.hpp"
@@ -20,6 +21,8 @@ MusicEditor::MusicEditor(Maestro &maestro)
   oam_clear();
 
   scroll(0, 0);
+
+  Camera::init();
 
   ppu_on_all();
 
@@ -218,7 +221,12 @@ void MusicEditor::loop() {
       play_note();
     }
 
-    render_sprites();
+    s16 cursor_x = 0x28 + current_row * 0x10;
+    u8 cursor_y = note_height[(u8)note[(u8)current_channel]];
+
+    Camera::update(cursor_x, true);
+
+    render_sprites(cursor_x, cursor_y);
   }
 }
 
@@ -228,9 +236,7 @@ void MusicEditor::play_note() {
       instruments[(u8)current_channel][instrument_index[(u8)current_channel]]);
 }
 
-void MusicEditor::render_sprites() {
-  s16 x_position = 0x28 + current_row * 0x10;
-  u8 y_position = note_height[(u8)note[(u8)current_channel]];
+void MusicEditor::render_sprites(s16 cursor_x, u8 cursor_y) {
   void *metasprite;
   switch (current_channel) {
   case GGSound::Channel::Square_1:
@@ -249,6 +255,6 @@ void MusicEditor::render_sprites() {
     metasprite = (void *)metasprite_dpcm_cursor;
     break;
   }
-  banked_oam_meta_spr_horizontal(x_position - x_scroll, y_position, metasprite);
+  banked_oam_meta_spr_horizontal(cursor_x - x_scroll, cursor_y, metasprite);
   oam_hide_rest();
 }

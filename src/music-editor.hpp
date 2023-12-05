@@ -19,7 +19,7 @@ class MusicEditor {
 
   s16 x_scroll;
 
-  void render_sprites();
+  void render_sprites(s16 cursor_x, u8 cursor_y);
   void play_note();
 
 public:

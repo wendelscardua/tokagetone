@@ -26,6 +26,7 @@ add_library(SourceObj
 
   banked-asset-helpers.s
   banked-asset-helpers.cpp
+  camera.cpp
   ggsound.cpp
   log.cpp
   zx02.s
