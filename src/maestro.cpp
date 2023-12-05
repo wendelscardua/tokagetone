@@ -18,7 +18,7 @@ extern const GGSound::Track *synthetic_sfx_list[];
 
 extern const u8 sfx_frame_template[];
 
-Entry Row::channel_entry(GGSound::Channel channel) {
+Entry &Row::channel_entry(GGSound::Channel channel) {
   switch (channel) {
   case GGSound::Channel::Square_1:
     return square1;

@@ -182,7 +182,7 @@ struct Row {
   Entry noise;
   Entry dpcm;
 
-  Entry channel_entry(GGSound::Channel channel);
+  Entry &channel_entry(GGSound::Channel channel);
 };
 
 class Maestro {
