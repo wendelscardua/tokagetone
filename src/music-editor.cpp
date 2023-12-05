@@ -157,9 +157,16 @@ void MusicEditor::loop() {
     pad_poll(0);
 
     u8 pressed = get_pad_new(0);
-    if (pressed & (PAD_A | PAD_START)) {
-      maestro.dynamic_sfx(GGSound::Channel::DPCM, SongOpCode::C3,
-                          Instrument::AEIOU);
+    if (pressed & (PAD_START)) {
+      maestro.update_streams();
+      banked_play_song(Song::Synthetic);
+    }
+    if (pressed & (PAD_A)) {
+      maestro.rows[current_row].channel_entry(current_channel) = {
+          note[(u8)current_channel],
+          instruments[(u8)current_channel]
+                     [instrument_index[(u8)current_channel]],
+      };
     }
     if (pressed & (PAD_B)) {
       if (current_channel == GGSound::Channel::DPCM) {
