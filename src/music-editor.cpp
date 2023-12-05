@@ -169,12 +169,30 @@ const u8 note_height[] = {
 
 void MusicEditor::loop() {
   play_note();
+
+  u8 old_held = 0;
+  u8 held_counter = 0;
+
   while (current_game_state == GameState::MusicEditor) {
     ppu_wait_nmi();
 
     pad_poll(0);
 
+    u8 held = pad_state(0);
+
     u8 pressed = get_pad_new(0);
+
+    if (held != old_held) {
+      old_held = held;
+      held_counter = 0;
+    } else {
+      held_counter++;
+      if (held_counter >= 16) {
+        held_counter = 4;
+        pressed |= held;
+      }
+    }
+
     if (pressed & (PAD_START)) {
       maestro.update_streams();
       banked_play_song(Song::Synthetic);
@@ -227,13 +245,11 @@ void MusicEditor::loop() {
       if (current_row > 0) {
         current_row--;
       }
-      play_note();
     }
     if (pressed & (PAD_RIGHT)) {
       if (current_row < Maestro::MAX_ROWS - 1) {
         current_row++;
       }
-      play_note();
     }
 
     if (pressed & (PAD_SELECT)) {
