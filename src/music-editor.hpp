@@ -17,8 +17,6 @@ class MusicEditor {
   SongOpCode note[Maestro::MAX_CHANNELS];
   u8 instrument_index[Maestro::MAX_CHANNELS];
 
-  s16 x_scroll;
-
   void render_sprites(s16 cursor_x, u8 cursor_y);
   void play_note();
 

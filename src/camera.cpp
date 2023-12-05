@@ -10,7 +10,7 @@ namespace Camera {
   s16 max_x;
 
   void init() {
-    Camera::max_x = (Maestro::MAX_ROWS + 2) * 16 - 256;
+    Camera::max_x = (Maestro::MAX_ROWS + 4) * 16 - 256;
 
     Camera::x = 0;
 
@@ -47,8 +47,4 @@ namespace Camera {
   s16 min_horizontal_strip() { return (x >> 4) - 1; }
 
   s16 max_horizontal_strip() { return (x >> 4) + 16; }
-
-  s16 min_vertical_strip() { return (y >> 4) - 1; }
-
-  s16 max_vertical_strip() { return (y >> 4) + 15; }
 } // namespace Camera

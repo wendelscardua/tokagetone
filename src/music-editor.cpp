@@ -13,7 +13,7 @@ MusicEditor::MusicEditor(Maestro &maestro)
       current_channel(GGSound::Channel::Square_1),
       note{SongOpCode::C3, SongOpCode::C3, SongOpCode::C4, (SongOpCode)0x00,
            SongOpCode::C3},
-      instrument_index{0, 0, 0, 0, 0}, x_scroll(0) {
+      instrument_index{0, 0, 0, 0, 0} {
   load_music_editor_assets();
 
   pal_bright(0);
@@ -224,7 +224,7 @@ void MusicEditor::loop() {
     s16 cursor_x = 0x28 + current_row * 0x10;
     u8 cursor_y = note_height[(u8)note[(u8)current_channel]];
 
-    Camera::update(cursor_x, true);
+    Camera::update(cursor_x, false);
 
     render_sprites(cursor_x, cursor_y);
   }
@@ -255,6 +255,6 @@ void MusicEditor::render_sprites(s16 cursor_x, u8 cursor_y) {
     metasprite = (void *)metasprite_dpcm_cursor;
     break;
   }
-  banked_oam_meta_spr_horizontal(cursor_x - x_scroll, cursor_y, metasprite);
+  banked_oam_meta_spr_horizontal(cursor_x - Camera::x, cursor_y, metasprite);
   oam_hide_rest();
 }
