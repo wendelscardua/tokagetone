@@ -3,15 +3,12 @@
 #include <nesdoug.h>
 
 namespace Camera {
-  static constexpr u8 horizontal_margin = 0x60;
-  static constexpr u8 music_margin = 2;
-
   s16 x;
 
   s16 max_x;
 
   void init() {
-    Camera::max_x = (last_strip() + 1) * 16 - 256;
+    Camera::max_x = (last_strip() + 2) * 16 - 256;
 
     Camera::x = 0;
 
@@ -52,13 +49,13 @@ namespace Camera {
   s16 last_strip() { return (Maestro::MAX_ROWS - 1 + 2 * music_margin); }
 
   StripType strip_type(s16 strip) {
-    if (strip == 0) {
+    if (strip < music_margin - 1) {
       return StripType::LeftMargin1;
-    } else if (strip == 1) {
+    } else if (strip == music_margin - 1) {
       return StripType::LeftMargin2;
-    } else if (strip == last_strip() - 1) {
+    } else if (strip == last_strip() - music_margin + 1) {
       return StripType::RightMargin1;
-    } else if (strip == last_strip()) {
+    } else if (strip > last_strip() - music_margin + 1) {
       return StripType::RightMargin2;
     } else if (((strip - music_margin) & 0b11) == 3) {
       return StripType::MusicFourthRow;

@@ -236,7 +236,7 @@ void MusicEditor::loop() {
       play_note();
     }
 
-    s16 cursor_x = 0x28 + current_row * 0x10;
+    s16 cursor_x = 0x8 + 0x10 * Camera::music_margin + current_row * 0x10;
     u8 cursor_y = note_height[(u8)note[(u8)current_channel]];
 
     Camera::update(cursor_x, true);
@@ -279,7 +279,7 @@ void MusicEditor::render_sprites(s16 cursor_x, u8 cursor_y) {
 void MusicEditor::load_strip(s16 strip) {
   if (strip >= min_loaded_strip && strip <= max_loaded_strip)
     return;
-  if (strip < 0 || strip >= Camera::last_strip())
+  if (strip < 0 || strip > Camera::last_strip())
     return;
 
   u8 first_column[24], second_column[24];

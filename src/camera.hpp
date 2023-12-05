@@ -3,6 +3,9 @@
 #include "common.hpp"
 
 namespace Camera {
+  static constexpr u8 horizontal_margin = 0x60;
+  static constexpr u8 music_margin = 2;
+
   extern s16 x;
   extern s16 y;
 
