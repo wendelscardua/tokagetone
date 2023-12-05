@@ -57,7 +57,7 @@ namespace Camera {
       return StripType::RightMargin1;
     } else if (strip > last_strip() - music_margin + 1) {
       return StripType::RightMargin2;
-    } else if (((strip - music_margin) & 0b11) == 3) {
+    } else if (((strip - music_margin) & 0b11) == 0) {
       return StripType::MusicFourthRow;
     } else {
       return StripType::MusicRow;
