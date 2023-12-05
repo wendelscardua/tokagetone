@@ -150,6 +150,7 @@ const u8 note_height[] = {
 };
 
 void MusicEditor::loop() {
+  play_note();
   while (current_game_state == GameState::MusicEditor) {
     ppu_wait_nmi();
 
