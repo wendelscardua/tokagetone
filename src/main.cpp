@@ -20,10 +20,14 @@ static void main_init() {
   // set 8x8 sprite mode
   oam_size(0);
 
-  // Use lower half of PPU memory for background tiles
   bank_bg(0);
-  // ... and upper half for sprites
   bank_spr(1);
+  set_chr_mode_0(0);
+  set_chr_mode_1(2);
+  set_chr_mode_2(4);
+  set_chr_mode_3(5);
+  set_chr_mode_4(6);
+  set_chr_mode_5(7);
 
   set_vram_buffer();
 
