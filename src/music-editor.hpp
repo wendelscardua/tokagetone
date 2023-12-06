@@ -18,7 +18,11 @@ class MusicEditor {
   u8 instrument_index[Maestro::MAX_CHANNELS];
   s16 min_loaded_strip, max_loaded_strip;
 
-  void render_sprites(s16 cursor_x, u8 cursor_y);
+  bool is_playing;
+  u8 playing_row;
+  u8 playing_step_counter;
+
+  void render_sprites(s16 cursor_x, u8 cursor_y, s16 playing_x);
   void play_note();
   void load_strip(s16 strip, bool force);
 

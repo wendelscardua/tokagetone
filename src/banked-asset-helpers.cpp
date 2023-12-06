@@ -33,5 +33,7 @@ __attribute__((noinline, section(".prg_rom_0"))) void
 load_music_editor_assets() {
   vram_adr(NAMETABLE_A);
   zx02_decompress_to_vram((void *)music_editor_nametable, NAMETABLE_A);
+  vram_adr(NAMETABLE_B);
+  zx02_decompress_to_vram((void *)music_editor_nametable, NAMETABLE_A);
   load_title_palette();
 }

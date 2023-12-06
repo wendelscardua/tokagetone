@@ -1,4 +1,5 @@
 #include "music-editor.hpp"
+#include "bank-helper.hpp"
 #include "banked-asset-helpers.hpp"
 #include "camera.hpp"
 #include "common.hpp"
@@ -13,7 +14,8 @@ MusicEditor::MusicEditor(Maestro &maestro)
       current_channel(GGSound::Channel::Square_1),
       note{SongOpCode::C3, SongOpCode::C3, SongOpCode::C4, (SongOpCode)0x00,
            SongOpCode::C3},
-      instrument_index{0, 0, 0, 0, 0} {
+      instrument_index{0, 0, 0, 0, 0}, is_playing(false), playing_row(0),
+      playing_step_counter(0) {
   load_music_editor_assets();
 
   pal_bright(0);
@@ -199,8 +201,16 @@ void MusicEditor::loop() {
     }
 
     if (pressed & (PAD_START)) {
-      maestro.update_streams();
-      banked_play_song(Song::Synthetic);
+      if (is_playing) {
+        is_playing = false;
+        banked_lambda(GET_BANK(instrument_list), []() { GGSound::stop(); });
+      } else {
+        is_playing = true;
+        maestro.update_streams();
+        banked_play_song(Song::Synthetic);
+        playing_row = 0;
+        playing_step_counter = 0;
+      }
     }
     if (pressed & (PAD_A)) {
       const Entry new_entry = {
@@ -288,11 +298,29 @@ void MusicEditor::loop() {
       break;
     }
 
-    Camera::update(cursor_x, true);
+    s16 playing_x = 0x10 * Camera::music_margin + playing_row * 0x10;
+
+    // TODO: fix strip loading when moving too fast
+    if (is_playing) {
+      Camera::update(playing_x, true);
+    } else {
+      Camera::update(cursor_x, true);
+    }
     load_strip(Camera::min_horizontal_strip(), false);
     load_strip(Camera::max_horizontal_strip(), false);
 
-    render_sprites(cursor_x, cursor_y);
+    render_sprites(cursor_x, cursor_y, playing_x);
+
+    if (is_playing) {
+      playing_step_counter++;
+      if (playing_step_counter >= 6) {
+        playing_step_counter = 0;
+        playing_row++;
+        if (playing_row == Maestro::MAX_ROWS) {
+          playing_row = 0;
+        }
+      }
+    }
   }
 }
 
@@ -302,7 +330,7 @@ void MusicEditor::play_note() {
       instruments[(u8)current_channel][instrument_index[(u8)current_channel]]);
 }
 
-void MusicEditor::render_sprites(s16 cursor_x, u8 cursor_y) {
+void MusicEditor::render_sprites(s16 cursor_x, u8 cursor_y, s16 playing_x) {
   void *metasprite;
   switch (current_channel) {
   case GGSound::Channel::Square_1:
@@ -322,6 +350,8 @@ void MusicEditor::render_sprites(s16 cursor_x, u8 cursor_y) {
     break;
   }
   banked_oam_meta_spr_horizontal(cursor_x - Camera::x, cursor_y, metasprite);
+  banked_oam_meta_spr_horizontal(playing_x - Camera::x, 0xc9,
+                                 metasprite_track_lizard);
   oam_hide_rest();
 }
 
