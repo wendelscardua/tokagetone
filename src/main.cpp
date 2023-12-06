@@ -32,6 +32,8 @@ static void main_init() {
   set_vram_buffer();
 
   current_game_state = GameState::TitleScreen;
+
+  asm volatile("cli");
 }
 
 int main() {

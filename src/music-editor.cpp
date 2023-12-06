@@ -6,8 +6,11 @@
 #include "ggsound.hpp"
 #include "maestro.hpp"
 #include "metasprites.hpp"
+#include <mapper.h>
 #include <nesdoug.h>
 #include <neslib.h>
+
+const u8 irq_buffer[] = {0xcf, 0xfd, 0xf5, 0x00, 0xf0, 0b10001000, 0xff};
 
 MusicEditor::MusicEditor(Maestro &maestro)
     : maestro(maestro), current_row(0),
@@ -43,12 +46,15 @@ MusicEditor::MusicEditor(Maestro &maestro)
 
   ppu_on_all();
 
+  set_irq_ptr(irq_buffer);
+
   pal_fade_to(0, 4);
 }
 
 MusicEditor::~MusicEditor() {
   pal_fade_to(4, 0);
   ppu_off();
+  disable_irq();
 }
 
 // TODO: revise this
