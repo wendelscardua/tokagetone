@@ -300,12 +300,8 @@ void MusicEditor::loop() {
 
     s16 playing_x = 0x10 * Camera::music_margin + playing_row * 0x10;
 
-    // TODO: fix strip loading when moving too fast
-    if (is_playing) {
-      Camera::update(playing_x, true);
-    } else {
-      Camera::update(cursor_x, true);
-    }
+    Camera::update(cursor_x, true);
+
     load_strip(Camera::min_horizontal_strip(), false);
     load_strip(Camera::max_horizontal_strip(), false);
 
