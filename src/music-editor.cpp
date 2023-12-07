@@ -304,12 +304,15 @@ void MusicEditor::loop() {
       break;
     }
 
-    s16 playing_x = 0x10 * Camera::music_margin + playing_row * 0x10;
-
     Camera::update(cursor_x, true);
 
-    load_strip(Camera::min_horizontal_strip(), false);
-    load_strip(Camera::max_horizontal_strip(), false);
+    extern u8 VRAM_INDEX;
+    if (VRAM_INDEX < 16) {
+      load_strip(Camera::min_horizontal_strip(), false);
+      load_strip(Camera::max_horizontal_strip(), false);
+    }
+
+    s16 playing_x = 0x10 * Camera::music_margin + playing_row * 0x10;
 
     render_sprites(cursor_x, cursor_y, playing_x);
 
