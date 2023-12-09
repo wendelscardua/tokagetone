@@ -9,6 +9,7 @@
 #include <mapper.h>
 #include <nesdoug.h>
 #include <neslib.h>
+#include <string.h>
 
 const u8 irq_buffer[] = {0xcf, 0xfd, 0xf5, 0x00, 0xf0, 0b10001000, 0xff};
 
@@ -360,6 +361,26 @@ void MusicEditor::render_sprites(s16 cursor_x, u8 cursor_y, s16 playing_x) {
   oam_hide_rest();
 }
 
+const unsigned char empty_strip[1 * 24] = {
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+
+const unsigned char left_border_strip[1 * 24] = {
+    0x25, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10,
+    0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x26};
+
+const unsigned char left_notes_strip[1 * 24] = {
+    0x23, 0x33, 0x22, 0x32, 0x20, 0x30, 0x0f, 0x1f, 0x0d, 0x1d, 0x0c, 0x1c,
+    0x0a, 0x1a, 0x08, 0x18, 0x07, 0x17, 0x05, 0x15, 0x03, 0x13, 0x01, 0x11};
+
+const unsigned char right_notes_strip[1 * 24] = {
+    0x24, 0x34, 0x04, 0x14, 0x21, 0x31, 0x04, 0x14, 0x0e, 0x1e, 0x04, 0x14,
+    0x0b, 0x1b, 0x09, 0x19, 0x04, 0x14, 0x06, 0x16, 0x04, 0x14, 0x02, 0x12};
+
+const unsigned char right_border_strip[1 * 24] = {
+    0x35, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10,
+    0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x36};
+
 void MusicEditor::load_strip(s16 strip, bool force) {
   if (!force && strip >= min_loaded_strip && strip <= max_loaded_strip)
     return;
@@ -372,20 +393,17 @@ void MusicEditor::load_strip(s16 strip, bool force) {
   switch (Camera::strip_type(strip)) {
 
   case Camera::StripType::LeftMargin1:
-    for (u8 i = 0; i < 24; i += 2) {
-      first_column[i] = 0x11;
-      first_column[i + 1] = 0x11;
-      second_column[i] = 0x11;
-      second_column[i + 1] = 0x11;
-    }
+    memcpy(first_column, empty_strip, 24);
+    memcpy(second_column, left_border_strip, 24);
     break;
   case Camera::StripType::LeftMargin2:
-    for (u8 i = 0; i < 24; i += 2) {
-      first_column[i] = 0x12;
-      first_column[i + 1] = 0x12;
-      second_column[i] = 0x12;
-      second_column[i + 1] = 0x12;
-    }
+  case Camera::StripType::RightMargin1:
+    memcpy(first_column, left_notes_strip, 24);
+    memcpy(second_column, right_notes_strip, 24);
+    break;
+  case Camera::StripType::RightMargin2:
+    memcpy(first_column, right_border_strip, 24);
+    memcpy(second_column, empty_strip, 24);
     break;
   case Camera::StripType::MusicRow:
     for (u8 i = 0; i < 24; i += 2) {
@@ -439,22 +457,6 @@ void MusicEditor::load_strip(s16 strip, bool force) {
       second_column[tile_index + 1] = 0x66;
     }
 
-    break;
-  case Camera::StripType::RightMargin1:
-    for (u8 i = 0; i < 24; i += 2) {
-      first_column[i] = 0x13;
-      first_column[i + 1] = 0x13;
-      second_column[i] = 0x13;
-      second_column[i + 1] = 0x13;
-    }
-    break;
-  case Camera::StripType::RightMargin2:
-    for (u8 i = 0; i < 24; i += 2) {
-      first_column[i] = 0x14;
-      first_column[i + 1] = 0x14;
-      second_column[i] = 0x14;
-      second_column[i + 1] = 0x14;
-    }
     break;
   }
 
