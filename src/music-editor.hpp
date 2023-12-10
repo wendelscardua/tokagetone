@@ -30,6 +30,7 @@ class MusicEditor {
 
   EditorMode mode;
   MenuOption menu_option;
+  u8 current_slot;
 
   u8 current_row;
   GGSound::Channel current_channel;
@@ -49,8 +50,7 @@ class MusicEditor {
   void load_strip(s16 strip, bool force);
   void editor_handler(u8 pressed);
   void menu_handler(u8 pressed);
-  void save_handler(u8 pressed);
-  void load_handler(u8 pressed);
+  void slot_handler(u8 pressed);
   void stop_music();
   void play_music();
 

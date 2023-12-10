@@ -191,6 +191,7 @@ struct Row {
 
 class Maestro {
 public:
+  static constexpr u8 MAX_SLOTS = 8;
   static constexpr u8 MAX_ROWS = 64;
   static constexpr u8 MAX_CHANNELS = 5;
   static constexpr u8 MAX_INSTRUCTIONS = 200;
@@ -202,6 +203,8 @@ public:
   void slower();
   void faster();
   void clear();
+  void save(u8 slot);
+  void load(u8 slot);
   void update_streams();
   void dynamic_sfx(GGSound::Channel channel, SongOpCode note,
                    Instrument instrument);

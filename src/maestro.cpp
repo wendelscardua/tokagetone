@@ -13,6 +13,10 @@ __attribute__((section(".prg_ram.noinit"))) volatile u8
 __attribute__((section(".prg_ram.noinit"))) volatile u8
     sfx_frame[Maestro::MAX_CHANNELS][Maestro::MAX_SFX_INSTRUCTIONS];
 
+__attribute__((section(".prg_ram.noinit"))) u32 save_signature;
+__attribute__((section(".prg_ram.noinit")))
+Row save_files[Maestro::MAX_SLOTS][Maestro::MAX_ROWS];
+
 extern const GGSound::Track *synthetic_song_list[];
 extern const GGSound::Track *synthetic_sfx_list[];
 
@@ -145,5 +149,17 @@ void Maestro::slower() {
 void Maestro::faster() {
   if (speed > 1) {
     speed--;
+  }
+}
+
+void Maestro::save(u8 slot) {
+  for (u8 i = 0; i < MAX_ROWS; i++) {
+    save_files[slot][i] = rows[i];
+  }
+}
+
+void Maestro::load(u8 slot) {
+  for (u8 i = 0; i < MAX_ROWS; i++) {
+    rows[i] = save_files[slot][i];
   }
 }

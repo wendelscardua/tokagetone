@@ -12,9 +12,10 @@
 #include <string.h>
 
 const u8 irq_buffer[] = {0xcf, 0xfd, 0xf5, 0x00, 0xf0, 0b10001000, 0xff};
+const u8 irq_alt_buffer[] = {0xcf, 0xfd, 0xf5, 0x00, 0xf0, 0b10001001, 0xff};
 
 MusicEditor::MusicEditor(Maestro &maestro)
-    : maestro(maestro), mode(EditorMode::Edit), current_row(0),
+    : maestro(maestro), mode(EditorMode::Edit), current_slot(0), current_row(0),
       current_channel(GGSound::Channel::Square_1),
       note{SongOpCode::C3, SongOpCode::C3, SongOpCode::C4, (SongOpCode)0x00,
            SongOpCode::C3},
@@ -307,9 +308,11 @@ void MusicEditor::menu_handler(u8 pressed) {
       break;
     case MenuOption::Load:
       mode = MusicEditor::EditorMode::SelectLoadSlot;
+      set_irq_ptr(irq_alt_buffer);
       break;
     case MenuOption::Save:
       mode = EditorMode::SelectSaveSlot;
+      set_irq_ptr(irq_alt_buffer);
       break;
     case MenuOption::New:
       pal_fade_to(4, 0);
@@ -333,8 +336,31 @@ void MusicEditor::menu_handler(u8 pressed) {
   }
 }
 
-void MusicEditor::load_handler(u8 pressed) {}
-void MusicEditor::save_handler(u8 pressed) {}
+void MusicEditor::slot_handler(u8 pressed) {
+  if (pressed & (PAD_B)) {
+    mode = EditorMode::Menu;
+    set_irq_ptr(irq_buffer);
+  } else if (pressed & (PAD_RIGHT | PAD_DOWN | PAD_SELECT)) {
+    current_slot = (current_slot + 1) & 0x07;
+  } else if (pressed & (PAD_LEFT | PAD_UP)) {
+    current_slot = (current_slot + 7) & 0x07;
+  } else if (pressed & (PAD_A | PAD_START)) {
+    if (mode == EditorMode::SelectSaveSlot) {
+      maestro.save(current_slot);
+    } else { // SelectLoadSlot
+      pal_fade_to(4, 0);
+      if (is_playing) {
+        stop_music();
+      }
+      ppu_off();
+      maestro.load(current_slot);
+      maestro.update_streams();
+      reset_editor();
+      ppu_on_all();
+      pal_fade_to(0, 4);
+    }
+  }
+}
 
 void MusicEditor::loop() {
   play_note();
@@ -375,10 +401,8 @@ void MusicEditor::loop() {
       menu_handler(pressed);
       break;
     case EditorMode::SelectLoadSlot:
-      load_handler(pressed);
-      break;
     case EditorMode::SelectSaveSlot:
-      save_handler(pressed);
+      slot_handler(pressed);
       break;
     }
 
@@ -475,20 +499,25 @@ void MusicEditor::render_sprites(s16 cursor_x, u8 cursor_y, s16 playing_x) {
       break;
     }
     banked_oam_meta_spr_horizontal(cursor_x - Camera::x, cursor_y, metasprite);
+    banked_oam_meta_spr_horizontal(speed_x_coords[12 - maestro.speed], 0xdf,
+                                   metasprite_speed_cursor);
 
   } break;
   case EditorMode::Menu:
     banked_oam_meta_spr_horizontal(menu_option_x_coords[(u8)menu_option], 0xd7,
                                    metasprite_menu_cursor);
+    banked_oam_meta_spr_horizontal(speed_x_coords[12 - maestro.speed], 0xdf,
+                                   metasprite_speed_cursor);
+
     break;
   case EditorMode::SelectLoadSlot:
   case EditorMode::SelectSaveSlot:
+    banked_oam_meta_spr_horizontal(0x10 * current_slot + 0x20, 0xd7,
+                                   metasprite_menu_cursor);
     break;
   }
   banked_oam_meta_spr_horizontal(playing_x - Camera::x, 0xc9,
                                  metasprite_track_lizard);
-  banked_oam_meta_spr_horizontal(speed_x_coords[12 - maestro.speed], 0xdf,
-                                 metasprite_speed_cursor);
   oam_hide_rest();
 }
 
