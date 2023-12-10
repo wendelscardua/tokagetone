@@ -166,6 +166,16 @@ enum class Instrument : u8 {
   Voice3Heavy,
   Voice3HeavyOct,
   Voice3Slide,
+  HeavyMajArp2,
+  SussGlue,
+  BullPlink,
+  Voice5,
+  Voice3Echo,
+  Voice3,
+  Voice4,
+  Voice4Echo,
+  PlinkEcho,
+  StarPlinkEcho,
   Silence,
   None, // subtle difference, Silence is a valid output
 };

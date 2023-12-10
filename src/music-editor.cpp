@@ -44,11 +44,31 @@ MusicEditor::~MusicEditor() {
 
 // TODO: revise this
 const Instrument square_instruments[] = {
-    Instrument::Plink, Instrument::StarPlink, Instrument::Voice1};
-const Instrument triangle_instruments[] = {Instrument::TriangleSnare,
-                                           Instrument::BassKick};
+    Instrument::Powerchord,     Instrument::StarPlink,
+    Instrument::Voice3Heavy,    Instrument::Voice4,
+    Instrument::StarPlinkEcho,  Instrument::Voice3,
+    Instrument::Plink,          Instrument::Voice2,
+    Instrument::Voice3Echo,     Instrument::Click50,
+    Instrument::Click00,        Instrument::Click15,
+    Instrument::Voice3HeavyOct, Instrument::BullPlink,
+    Instrument::SussGlue,       Instrument::Voice4Echo,
+    Instrument::TriangleSnare,  Instrument::Voice1,
+    Instrument::HiHats,         Instrument::Perc3,
+    Instrument::Perc2,          Instrument::Voice5,
+    Instrument::PlinkEcho,      Instrument::Perc1,
+    Instrument::HeavyMajArp2,
+};
+const Instrument triangle_instruments[] = {
+    Instrument::Click00,    Instrument::TriangleSnare, Instrument::Perc1,
+    Instrument::BassKick,   Instrument::Plink,         Instrument::HiHats,
+    Instrument::Voice1,     Instrument::Click15,       Instrument::Perc2,
+    Instrument::Voice4,     Instrument::StarPlinkEcho, Instrument::Voice3,
+    Instrument::Voice2,     Instrument::Perc3,         Instrument::PlinkEcho,
+    Instrument::Voice3Slide};
 const Instrument noise_instruments[] = {
-    Instrument::KickHatsCombo, Instrument::SnareHatsCombo, Instrument::HiHats};
+    Instrument::HiHats,  Instrument::Perc2,          Instrument::KickHatsCombo,
+    Instrument::Click00, Instrument::SnareHatsCombo, Instrument::Perc3,
+    Instrument::Perc1,   Instrument::Click50};
 const Instrument dpcm_instruments[] = {Instrument::AEIOU};
 
 const Instrument *instruments[] = {
