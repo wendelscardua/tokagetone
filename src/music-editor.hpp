@@ -8,7 +8,7 @@ class MusicEditor {
       SongOpCode::C3};
   static constexpr SongOpCode MAX_NOTE_PER_CHANNEL[] = {
       SongOpCode::B7, SongOpCode::B7, SongOpCode::B7, (SongOpCode)0x0f,
-      SongOpCode::G3};
+      SongOpCode::B3};
 
   Maestro &maestro;
 
