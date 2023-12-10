@@ -10,18 +10,11 @@
         
         .include "soundtrack.asm"
 
-        .global synthetic_song_list
-        synthetic_song_list:
-        .word synthetic_track
-
-        synthetic_track:
-        .byte 0, 6
-        .byte 0, 5
-        .word synth_square1_stream
-        .word synth_square2_stream
-        .word synth_triangle_stream
-        .word synth_noise_stream
-        .word synth_dpcm_stream
+        .global synth_square1_stream
+        .global synth_square2_stream
+        .global synth_triangle_stream
+        .global synth_noise_stream
+        .global synth_dpcm_stream 
 
         .global frame
 

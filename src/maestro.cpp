@@ -7,6 +7,14 @@
 #include "soundtrack.hpp"
 #include <string.h>
 
+extern const u8 synth_square1_stream[];
+extern const u8 synth_square2_stream[];
+extern const u8 synth_triangle_stream[];
+extern const u8 synth_noise_stream[];
+extern const u8 synth_dpcm_stream[];
+
+static GGSound::Track synthetic_track;
+
 __attribute__((
     section(".prg_ram.noinit"))) volatile unsigned long save_signature;
 
@@ -19,10 +27,13 @@ __attribute__((section(".prg_ram.noinit"))) volatile u8
 __attribute__((section(".prg_ram.noinit")))
 Row save_files[Maestro::MAX_SLOTS][Maestro::MAX_ROWS];
 
-extern const GGSound::Track *synthetic_song_list[];
 extern const GGSound::Track *synthetic_sfx_list[];
 
 extern const u8 sfx_frame_template[];
+
+const GGSound::Track *synthetic_song_list[] = {
+    &synthetic_track,
+};
 
 Entry &Row::channel_entry(GGSound::Channel channel) {
   switch (channel) {
@@ -45,7 +56,6 @@ Entry &Row::channel_entry(GGSound::Channel channel) {
 }
 
 Maestro::Maestro() {
-  clear();
   if (save_signature != SAVE_SIGNATURE) {
     for (u8 slot = 0; slot < MAX_SLOTS; ++slot) {
       for (auto &row : save_files[slot]) {
@@ -67,10 +77,20 @@ Maestro::Maestro() {
                   synthetic_sfx_list, instrument_list, dpcm_list,
                   GET_BANK(instrument_list));
   }
-  speed = 6; // TODO custom speed
 };
 
 void Maestro::clear() {
+  speed = 6;
+  {
+    ScopedBank scopedBank(GET_BANK(synth_square1_stream));
+    synthetic_track = {(u16)(speed * 256),
+                       (u16)(speed * 256 * 5 / 6),
+                       (void *)synth_square1_stream,
+                       (void *)synth_square2_stream,
+                       (void *)synth_triangle_stream,
+                       (void *)synth_noise_stream,
+                       (void *)synth_dpcm_stream};
+  }
   for (auto &row : rows) {
     row.square1 = row.square2 = row.triangle = row.noise = row.dpcm =
         Entry{SongOpCode::None, Instrument::Silence};
@@ -156,12 +176,30 @@ void Maestro::dynamic_sfx(GGSound::Channel channel, SongOpCode note,
 void Maestro::slower() {
   if (speed < 12) {
     speed++;
+
+    synthetic_track.ntsc_tempo = (u16)(speed * 256);
+    synthetic_track.pal_tempo = (u16)(speed * 256 * 5 / 6);
+    {
+      ScopedBank scopedBank(GET_BANK(instrument_list));
+      GGSound::init(GGSound::Region::NTSC, synthetic_song_list,
+                    synthetic_sfx_list, instrument_list, dpcm_list,
+                    GET_BANK(instrument_list));
+    }
   }
 }
 
 void Maestro::faster() {
   if (speed > 1) {
     speed--;
+
+    synthetic_track.ntsc_tempo = (u16)(speed * 256);
+    synthetic_track.pal_tempo = (u16)(speed * 256 * 5 / 6);
+    {
+      ScopedBank scopedBank(GET_BANK(instrument_list));
+      GGSound::init(GGSound::Region::NTSC, synthetic_song_list,
+                    synthetic_sfx_list, instrument_list, dpcm_list,
+                    GET_BANK(instrument_list));
+    }
   }
 }
 

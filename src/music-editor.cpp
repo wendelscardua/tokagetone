@@ -327,9 +327,11 @@ void MusicEditor::menu_handler(u8 pressed) {
       pal_fade_to(0, 4);
       break;
     case MenuOption::Slower:
+      stop_music();
       maestro.slower();
       break;
     case MenuOption::Faster:
+      stop_music();
       maestro.faster();
       break;
     }
@@ -446,7 +448,7 @@ void MusicEditor::loop() {
 
     if (is_playing) {
       playing_step_counter++;
-      if (playing_step_counter >= 6) {
+      if (playing_step_counter >= maestro.speed) {
         playing_step_counter = 0;
         playing_row++;
         if (playing_row == Maestro::MAX_ROWS) {
