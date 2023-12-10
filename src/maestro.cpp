@@ -7,13 +7,15 @@
 #include "soundtrack.hpp"
 #include <string.h>
 
+__attribute__((
+    section(".prg_ram.noinit"))) volatile unsigned long save_signature;
+
 __attribute__((section(".prg_ram.noinit"))) volatile u8
     frame[Maestro::MAX_CHANNELS][Maestro::MAX_INSTRUCTIONS];
 
 __attribute__((section(".prg_ram.noinit"))) volatile u8
     sfx_frame[Maestro::MAX_CHANNELS][Maestro::MAX_SFX_INSTRUCTIONS];
 
-__attribute__((section(".prg_ram.noinit"))) u32 save_signature;
 __attribute__((section(".prg_ram.noinit")))
 Row save_files[Maestro::MAX_SLOTS][Maestro::MAX_ROWS];
 
@@ -44,6 +46,17 @@ Entry &Row::channel_entry(GGSound::Channel channel) {
 
 Maestro::Maestro() {
   clear();
+  if (save_signature != SAVE_SIGNATURE) {
+    for (u8 slot = 0; slot < MAX_SLOTS; ++slot) {
+      for (auto &row : save_files[slot]) {
+        row.square1 = row.square2 = row.triangle = row.noise = row.dpcm =
+            Entry{SongOpCode::None, Instrument::Silence};
+      }
+    }
+    save_signature = SAVE_SIGNATURE;
+  }
+  clear();
+  update_streams();
   {
     ScopedBank scopedBank(GET_BANK(instrument_list));
     for (u8 i = 0; i < MAX_CHANNELS; i++) {

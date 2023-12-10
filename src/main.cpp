@@ -43,8 +43,6 @@ int main() {
 
   Maestro maestro;
 
-  maestro.update_streams();
-
   while (true) {
     switch (current_game_state) {
     case GameState::TitleScreen: {

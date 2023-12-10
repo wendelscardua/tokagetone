@@ -191,6 +191,7 @@ struct Row {
 
 class Maestro {
 public:
+  static constexpr u32 SAVE_SIGNATURE = 0xcafe0042;
   static constexpr u8 MAX_SLOTS = 8;
   static constexpr u8 MAX_ROWS = 64;
   static constexpr u8 MAX_CHANNELS = 5;
