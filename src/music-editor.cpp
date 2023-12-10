@@ -267,11 +267,13 @@ void MusicEditor::loop() {
       if (current_row > 0) {
         current_row--;
       }
+      play_note();
     }
     if (pressed & (PAD_RIGHT)) {
       if (current_row < Maestro::MAX_ROWS - 1) {
         current_row++;
       }
+      play_note();
     }
 
     if (pressed & (PAD_SELECT)) {
@@ -335,6 +337,9 @@ void MusicEditor::loop() {
 }
 
 void MusicEditor::play_note() {
+  if (is_playing) {
+    return;
+  }
   maestro.dynamic_sfx(
       current_channel, note[(u8)current_channel],
       instruments[(u8)current_channel][instrument_index[(u8)current_channel]]);
