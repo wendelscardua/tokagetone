@@ -59,7 +59,7 @@ add_raw_asset(SOURCE "SPR.chr")
 add_raw_asset(SOURCE "BG.pal")
 add_raw_asset(SOURCE "SPR.pal")
 add_zx02_asset(SOURCE "title.nam")
-add_zx02_asset(SOURCE "music-editor.nam")
+add_zx02_asset(SOURCE "music-editor.nam" ALT "music-editor-alt.nam")
 
 set_property(
   SOURCE
