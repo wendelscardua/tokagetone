@@ -26,6 +26,7 @@ __attribute__((section(".prg_ram.noinit"))) volatile u8
 
 __attribute__((section(".prg_ram.noinit")))
 Row save_files[Maestro::MAX_SLOTS][Maestro::MAX_ROWS];
+__attribute__((section(".prg_ram.noinit"))) u8 save_speeds[Maestro::MAX_SLOTS];
 
 extern const GGSound::Track *synthetic_sfx_list[];
 
@@ -62,6 +63,7 @@ Maestro::Maestro() {
         row.square1 = row.square2 = row.triangle = row.noise = row.dpcm =
             Entry{SongOpCode::None, Instrument::Silence};
       }
+      save_speeds[slot] = 6;
     }
     save_signature = SAVE_SIGNATURE;
   }
@@ -207,10 +209,12 @@ void Maestro::save(u8 slot) {
   for (u8 i = 0; i < MAX_ROWS; i++) {
     save_files[slot][i] = rows[i];
   }
+  save_speeds[slot] = speed;
 }
 
 void Maestro::load(u8 slot) {
   for (u8 i = 0; i < MAX_ROWS; i++) {
     rows[i] = save_files[slot][i];
   }
+  speed = save_speeds[slot];
 }
