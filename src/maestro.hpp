@@ -196,6 +196,7 @@ public:
   static constexpr u8 MAX_INSTRUCTIONS = 200;
   static constexpr u8 MAX_SFX_INSTRUCTIONS = 5;
   Row rows[MAX_ROWS];
+  u8 speed;
   Maestro();
 
   void update_streams();

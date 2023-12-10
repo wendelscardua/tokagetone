@@ -14,7 +14,7 @@
 const u8 irq_buffer[] = {0xcf, 0xfd, 0xf5, 0x00, 0xf0, 0b10001000, 0xff};
 
 MusicEditor::MusicEditor(Maestro &maestro)
-    : maestro(maestro), current_row(0),
+    : maestro(maestro), mode(EditorMode::Edit), current_row(0),
       current_channel(GGSound::Channel::Square_1),
       note{SongOpCode::C3, SongOpCode::C3, SongOpCode::C4, (SongOpCode)0x00,
            SongOpCode::C3},
@@ -176,6 +176,133 @@ const u8 note_height[] = {
     0x10, // B7
 };
 
+const u8 menu_option_x_coords[] = {0x20, 0x40, 0x50, 0x60, 0x80, 0xd0};
+const u8 speed_x_coords[] = {
+    0x00,         0xa0 + 0 * 3,  0xa0 + 1 * 3, 0xa0 + 2 * 3, 0xa0 + 3 * 3,
+    0xa0 + 4 * 3, 0xa0 + 5 * 3,  0xa0 + 6 * 3, 0xa0 + 7 * 3, 0xa0 + 8 * 3,
+    0xa0 + 9 * 3, 0xa0 + 10 * 3, 0xa0 + 11 * 3};
+
+void MusicEditor::editor_handler(u8 pressed) {
+
+  if (pressed & (PAD_START)) {
+    mode = EditorMode::Menu;
+    menu_option = MenuOption::PlayStop;
+  }
+  if (pressed & (PAD_A)) {
+    const Entry new_entry = {
+        note[(u8)current_channel],
+        instruments[(u8)current_channel][instrument_index[(u8)current_channel]],
+    };
+    Entry &current_entry =
+        maestro.rows[current_row].channel_entry(current_channel);
+    if (current_entry == new_entry) {
+      current_entry = {SongOpCode::None, Instrument::None};
+    } else {
+      current_entry = new_entry;
+    }
+    load_strip(Camera::music_margin + current_row, true);
+    play_note();
+  }
+  if (pressed & (PAD_B)) {
+    if (current_channel == GGSound::Channel::DPCM) {
+      current_channel = GGSound::Channel::Square_1;
+    } else {
+      current_channel = (GGSound::Channel)(((u8)current_channel) + 1);
+    }
+    play_note();
+  }
+  if (pressed & (PAD_UP)) {
+    if (note[(u8)current_channel] ==
+        MAX_NOTE_PER_CHANNEL[(u8)current_channel]) {
+      note[(u8)current_channel] = MIN_NOTE_PER_CHANNEL[(u8)current_channel];
+    } else {
+      note[(u8)current_channel] =
+          (SongOpCode)((u8)note[(u8)current_channel] + 1);
+    }
+    play_note();
+  }
+  if (pressed & (PAD_DOWN)) {
+    if (note[(u8)current_channel] ==
+        MIN_NOTE_PER_CHANNEL[(u8)current_channel]) {
+      note[(u8)current_channel] = MAX_NOTE_PER_CHANNEL[(u8)current_channel];
+    } else {
+      note[(u8)current_channel] =
+          (SongOpCode)((u8)note[(u8)current_channel] - 1);
+    }
+    play_note();
+  }
+  if (pressed & (PAD_LEFT)) {
+    if (current_row > 0) {
+      current_row--;
+    }
+    play_note();
+  }
+  if (pressed & (PAD_RIGHT)) {
+    if (current_row < Maestro::MAX_ROWS - 1) {
+      current_row++;
+    }
+    play_note();
+  }
+
+  if (pressed & (PAD_SELECT)) {
+    instrument_index[(u8)current_channel]++;
+    if (instrument_index[(u8)current_channel] ==
+        max_instruments[(u8)current_channel]) {
+      instrument_index[(u8)current_channel] = 0;
+    }
+    play_note();
+  }
+}
+
+void MusicEditor::menu_handler(u8 pressed) {
+  const MenuOption next_option[] = {
+      MenuOption::Load,   MenuOption::Save,   MenuOption::New,
+      MenuOption::Slower, MenuOption::Faster, MenuOption::PlayStop,
+
+  };
+
+  const MenuOption previous_option[] = {
+      MenuOption::Faster, MenuOption::PlayStop, MenuOption::Load,
+      MenuOption::Save,   MenuOption::New,      MenuOption::Slower,
+  };
+
+  if (pressed & (PAD_START | PAD_B)) {
+    mode = EditorMode::Edit;
+  } else if (pressed & (PAD_SELECT | PAD_DOWN | PAD_RIGHT)) {
+    menu_option = next_option[(u8)menu_option];
+  } else if (pressed & (PAD_UP | PAD_LEFT)) {
+    menu_option = previous_option[(u8)menu_option];
+  } else if (pressed & PAD_A) {
+    switch (menu_option) {
+    case MenuOption::PlayStop:
+      if (is_playing) {
+        is_playing = false;
+        banked_lambda(GET_BANK(instrument_list), []() { GGSound::stop(); });
+        multi_vram_buffer_horz((u8[]){0xe0, 0xe1}, 2, NTADR_A(4, 27));
+        multi_vram_buffer_horz((u8[]){0xf0, 0xf1}, 2, NTADR_A(4, 28));
+      } else {
+        is_playing = true;
+        maestro.update_streams();
+        banked_play_song(Song::Synthetic);
+        playing_row = 0;
+        playing_step_counter = 0;
+        multi_vram_buffer_horz((u8[]){0xe2, 0xe3}, 2, NTADR_A(4, 27));
+        multi_vram_buffer_horz((u8[]){0xf2, 0xf3}, 2, NTADR_A(4, 28));
+      }
+      break;
+    case MenuOption::Load:
+    case MenuOption::Save:
+    case MenuOption::New:
+    case MenuOption::Slower:
+    case MenuOption::Faster:
+      break;
+    }
+  }
+}
+
+void MusicEditor::load_handler(u8 pressed) {}
+void MusicEditor::save_handler(u8 pressed) {}
+
 void MusicEditor::loop() {
   play_note();
 
@@ -207,82 +334,19 @@ void MusicEditor::loop() {
       }
     }
 
-    if (pressed & (PAD_START)) {
-      if (is_playing) {
-        is_playing = false;
-        banked_lambda(GET_BANK(instrument_list), []() { GGSound::stop(); });
-      } else {
-        is_playing = true;
-        maestro.update_streams();
-        banked_play_song(Song::Synthetic);
-        playing_row = 0;
-        playing_step_counter = 0;
-      }
-    }
-    if (pressed & (PAD_A)) {
-      const Entry new_entry = {
-          note[(u8)current_channel],
-          instruments[(u8)current_channel]
-                     [instrument_index[(u8)current_channel]],
-      };
-      Entry &current_entry =
-          maestro.rows[current_row].channel_entry(current_channel);
-      if (current_entry == new_entry) {
-        current_entry = {SongOpCode::None, Instrument::None};
-      } else {
-        current_entry = new_entry;
-      }
-      load_strip(Camera::music_margin + current_row, true);
-      play_note();
-    }
-    if (pressed & (PAD_B)) {
-      if (current_channel == GGSound::Channel::DPCM) {
-        current_channel = GGSound::Channel::Square_1;
-      } else {
-        current_channel = (GGSound::Channel)(((u8)current_channel) + 1);
-      }
-      play_note();
-    }
-    if (pressed & (PAD_UP)) {
-      if (note[(u8)current_channel] ==
-          MAX_NOTE_PER_CHANNEL[(u8)current_channel]) {
-        note[(u8)current_channel] = MIN_NOTE_PER_CHANNEL[(u8)current_channel];
-      } else {
-        note[(u8)current_channel] =
-            (SongOpCode)((u8)note[(u8)current_channel] + 1);
-      }
-      play_note();
-    }
-    if (pressed & (PAD_DOWN)) {
-      if (note[(u8)current_channel] ==
-          MIN_NOTE_PER_CHANNEL[(u8)current_channel]) {
-        note[(u8)current_channel] = MAX_NOTE_PER_CHANNEL[(u8)current_channel];
-      } else {
-        note[(u8)current_channel] =
-            (SongOpCode)((u8)note[(u8)current_channel] - 1);
-      }
-      play_note();
-    }
-    if (pressed & (PAD_LEFT)) {
-      if (current_row > 0) {
-        current_row--;
-      }
-      play_note();
-    }
-    if (pressed & (PAD_RIGHT)) {
-      if (current_row < Maestro::MAX_ROWS - 1) {
-        current_row++;
-      }
-      play_note();
-    }
-
-    if (pressed & (PAD_SELECT)) {
-      instrument_index[(u8)current_channel]++;
-      if (instrument_index[(u8)current_channel] ==
-          max_instruments[(u8)current_channel]) {
-        instrument_index[(u8)current_channel] = 0;
-      }
-      play_note();
+    switch (mode) {
+    case EditorMode::Edit:
+      editor_handler(pressed);
+      break;
+    case EditorMode::Menu:
+      menu_handler(pressed);
+      break;
+    case EditorMode::SelectLoadSlot:
+      load_handler(pressed);
+      break;
+    case EditorMode::SelectSaveSlot:
+      save_handler(pressed);
+      break;
     }
 
     s16 cursor_x = 0x10 * Camera::music_margin + current_row * 0x10;
@@ -347,35 +411,51 @@ void MusicEditor::play_note() {
 }
 
 void MusicEditor::render_sprites(s16 cursor_x, u8 cursor_y, s16 playing_x) {
-  void *metasprite;
-  switch (current_channel) {
-  case GGSound::Channel::Square_1:
-    metasprite = note_alt_sprite_timer > 0
-                     ? (void *)metasprite_square1_cursor_alt
-                     : (void *)metasprite_square1_cursor;
+  switch (mode) {
+  case EditorMode::Edit: {
+    void *metasprite;
+    switch (current_channel) {
+    case GGSound::Channel::Square_1:
+      metasprite = note_alt_sprite_timer > 0
+                       ? (void *)metasprite_square1_cursor_alt
+                       : (void *)metasprite_square1_cursor;
+      break;
+    case GGSound::Channel::Square_2:
+      metasprite = note_alt_sprite_timer > 0
+                       ? (void *)metasprite_square2_cursor_alt
+                       : (void *)metasprite_square2_cursor;
+      break;
+    case GGSound::Channel::Triangle:
+      metasprite = note_alt_sprite_timer > 0
+                       ? (void *)metasprite_triangle_cursor_alt
+                       : (void *)metasprite_triangle_cursor;
+      break;
+    case GGSound::Channel::Noise:
+      metasprite = note_alt_sprite_timer > 0
+                       ? (void *)metasprite_noise_cursor_alt
+                       : (void *)metasprite_noise_cursor;
+      break;
+    case GGSound::Channel::DPCM:
+      metasprite = note_alt_sprite_timer > 0
+                       ? (void *)metasprite_dpcm_cursor_alt
+                       : (void *)metasprite_dpcm_cursor;
+      break;
+    }
+    banked_oam_meta_spr_horizontal(cursor_x - Camera::x, cursor_y, metasprite);
+
+  } break;
+  case EditorMode::Menu:
+    banked_oam_meta_spr_horizontal(menu_option_x_coords[(u8)menu_option], 0xd7,
+                                   metasprite_menu_cursor);
     break;
-  case GGSound::Channel::Square_2:
-    metasprite = note_alt_sprite_timer > 0
-                     ? (void *)metasprite_square2_cursor_alt
-                     : (void *)metasprite_square2_cursor;
-    break;
-  case GGSound::Channel::Triangle:
-    metasprite = note_alt_sprite_timer > 0
-                     ? (void *)metasprite_triangle_cursor_alt
-                     : (void *)metasprite_triangle_cursor;
-    break;
-  case GGSound::Channel::Noise:
-    metasprite = note_alt_sprite_timer > 0 ? (void *)metasprite_noise_cursor_alt
-                                           : (void *)metasprite_noise_cursor;
-    break;
-  case GGSound::Channel::DPCM:
-    metasprite = note_alt_sprite_timer > 0 ? (void *)metasprite_dpcm_cursor_alt
-                                           : (void *)metasprite_dpcm_cursor;
+  case EditorMode::SelectLoadSlot:
+  case EditorMode::SelectSaveSlot:
     break;
   }
-  banked_oam_meta_spr_horizontal(cursor_x - Camera::x, cursor_y, metasprite);
   banked_oam_meta_spr_horizontal(playing_x - Camera::x, 0xc9,
                                  metasprite_track_lizard);
+  banked_oam_meta_spr_horizontal(speed_x_coords[maestro.speed], 0xdf,
+                                 metasprite_speed_cursor);
   oam_hide_rest();
 }
 

@@ -10,7 +10,26 @@ class MusicEditor {
       SongOpCode::B7, SongOpCode::B7, SongOpCode::B7, (SongOpCode)0x0f,
       SongOpCode::B3};
 
+  enum class EditorMode : u8 {
+    Edit,
+    Menu,
+    SelectLoadSlot,
+    SelectSaveSlot,
+  };
+
+  enum class MenuOption : u8 {
+    PlayStop,
+    Load,
+    Save,
+    New,
+    Slower,
+    Faster,
+  };
+
   Maestro &maestro;
+
+  EditorMode mode;
+  MenuOption menu_option;
 
   u8 current_row;
   GGSound::Channel current_channel;
@@ -27,6 +46,10 @@ class MusicEditor {
   void render_sprites(s16 cursor_x, u8 cursor_y, s16 playing_x);
   void play_note();
   void load_strip(s16 strip, bool force);
+  void editor_handler(u8 pressed);
+  void menu_handler(u8 pressed);
+  void save_handler(u8 pressed);
+  void load_handler(u8 pressed);
 
 public:
   MusicEditor(Maestro &maestro);

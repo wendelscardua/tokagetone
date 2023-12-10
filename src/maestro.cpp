@@ -53,6 +53,7 @@ Maestro::Maestro() {
                   synthetic_sfx_list, instrument_list, dpcm_list,
                   GET_BANK(instrument_list));
   }
+  speed = 6; // TODO custom speed
 };
 
 void Maestro::update_streams() {
