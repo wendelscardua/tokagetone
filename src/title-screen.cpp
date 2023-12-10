@@ -1,13 +1,10 @@
 #include "title-screen.hpp"
 #include "banked-asset-helpers.hpp"
 #include "common.hpp"
-#include <cstdio>
 #include <nesdoug.h>
 #include <neslib.h>
 
 __attribute__((noinline)) TitleScreen::TitleScreen() {
-  putchar('T');
-  putchar('\n');
   pal_bright(0);
 
   ppu_off();
