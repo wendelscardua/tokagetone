@@ -26,24 +26,7 @@ MusicEditor::MusicEditor(Maestro &maestro)
 
   oam_clear();
 
-  scroll(0, 0);
-
-  Camera::init();
-
-  s16 min_strip = Camera::min_horizontal_strip() >= 0
-                      ? (u8)Camera::min_horizontal_strip()
-                      : 0;
-  s16 max_strip = Camera::max_horizontal_strip() <= Camera::last_strip()
-                      ? (u8)Camera::max_horizontal_strip()
-                      : Camera::last_strip();
-
-  min_loaded_strip = max_strip;
-  max_loaded_strip = min_strip;
-
-  for (auto strip = min_strip; strip <= max_strip; strip++) {
-    load_strip(strip, true);
-    flush_vram_update2();
-  }
+  reset_editor();
 
   ppu_on_all();
 
@@ -177,10 +160,51 @@ const u8 note_height[] = {
 };
 
 const u8 menu_option_x_coords[] = {0x20, 0x40, 0x50, 0x60, 0x80, 0xd0};
-const u8 speed_x_coords[] = {
-    0x00,         0xa0 + 0 * 3,  0xa0 + 1 * 3, 0xa0 + 2 * 3, 0xa0 + 3 * 3,
-    0xa0 + 4 * 3, 0xa0 + 5 * 3,  0xa0 + 6 * 3, 0xa0 + 7 * 3, 0xa0 + 8 * 3,
-    0xa0 + 9 * 3, 0xa0 + 10 * 3, 0xa0 + 11 * 3};
+const u8 speed_x_coords[] = {0xa0 + 0 * 3, 0xa0 + 1 * 3,  0xa0 + 2 * 3,
+                             0xa0 + 3 * 3, 0xa0 + 4 * 3,  0xa0 + 5 * 3,
+                             0xa0 + 6 * 3, 0xa0 + 7 * 3,  0xa0 + 8 * 3,
+                             0xa0 + 9 * 3, 0xa0 + 10 * 3, 0xa0 + 11 * 3};
+
+void MusicEditor::reset_editor() {
+  scroll(0, 0);
+
+  Camera::init();
+
+  s16 min_strip = Camera::min_horizontal_strip() >= 0
+                      ? (u8)Camera::min_horizontal_strip()
+                      : 0;
+  s16 max_strip = Camera::max_horizontal_strip() <= Camera::last_strip()
+                      ? (u8)Camera::max_horizontal_strip()
+                      : Camera::last_strip();
+
+  min_loaded_strip = max_strip;
+  max_loaded_strip = min_strip;
+
+  for (auto strip = min_strip; strip <= max_strip; strip++) {
+    load_strip(strip, true);
+    flush_vram_update2();
+  }
+  playing_row = 0;
+  playing_step_counter = 0;
+  current_row = 0;
+}
+
+void MusicEditor::stop_music() {
+  is_playing = false;
+  banked_lambda(GET_BANK(instrument_list), []() { GGSound::stop(); });
+  multi_vram_buffer_horz((u8[]){0xe0, 0xe1}, 2, NTADR_A(4, 27));
+  multi_vram_buffer_horz((u8[]){0xf0, 0xf1}, 2, NTADR_A(4, 28));
+}
+
+void MusicEditor::play_music() {
+  is_playing = true;
+  maestro.update_streams();
+  banked_play_song(Song::Synthetic);
+  playing_row = 0;
+  playing_step_counter = 0;
+  multi_vram_buffer_horz((u8[]){0xe2, 0xe3}, 2, NTADR_A(4, 27));
+  multi_vram_buffer_horz((u8[]){0xf2, 0xf3}, 2, NTADR_A(4, 28));
+}
 
 void MusicEditor::editor_handler(u8 pressed) {
 
@@ -276,25 +300,34 @@ void MusicEditor::menu_handler(u8 pressed) {
     switch (menu_option) {
     case MenuOption::PlayStop:
       if (is_playing) {
-        is_playing = false;
-        banked_lambda(GET_BANK(instrument_list), []() { GGSound::stop(); });
-        multi_vram_buffer_horz((u8[]){0xe0, 0xe1}, 2, NTADR_A(4, 27));
-        multi_vram_buffer_horz((u8[]){0xf0, 0xf1}, 2, NTADR_A(4, 28));
+        stop_music();
       } else {
-        is_playing = true;
-        maestro.update_streams();
-        banked_play_song(Song::Synthetic);
-        playing_row = 0;
-        playing_step_counter = 0;
-        multi_vram_buffer_horz((u8[]){0xe2, 0xe3}, 2, NTADR_A(4, 27));
-        multi_vram_buffer_horz((u8[]){0xf2, 0xf3}, 2, NTADR_A(4, 28));
+        play_music();
       }
       break;
     case MenuOption::Load:
+      mode = MusicEditor::EditorMode::SelectLoadSlot;
+      break;
     case MenuOption::Save:
+      mode = EditorMode::SelectSaveSlot;
+      break;
     case MenuOption::New:
+      pal_fade_to(4, 0);
+      if (is_playing) {
+        stop_music();
+      }
+      ppu_off();
+      maestro.clear();
+      maestro.update_streams();
+      reset_editor();
+      ppu_on_all();
+      pal_fade_to(0, 4);
+      break;
     case MenuOption::Slower:
+      maestro.slower();
+      break;
     case MenuOption::Faster:
+      maestro.faster();
       break;
     }
   }
@@ -454,7 +487,7 @@ void MusicEditor::render_sprites(s16 cursor_x, u8 cursor_y, s16 playing_x) {
   }
   banked_oam_meta_spr_horizontal(playing_x - Camera::x, 0xc9,
                                  metasprite_track_lizard);
-  banked_oam_meta_spr_horizontal(speed_x_coords[maestro.speed], 0xdf,
+  banked_oam_meta_spr_horizontal(speed_x_coords[12 - maestro.speed], 0xdf,
                                  metasprite_speed_cursor);
   oam_hide_rest();
 }

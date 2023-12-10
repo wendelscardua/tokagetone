@@ -39,10 +39,7 @@ Entry &Row::channel_entry(GGSound::Channel channel) {
 }
 
 Maestro::Maestro() {
-  for (auto &row : rows) {
-    row.square1 = row.square2 = row.triangle = row.noise = row.dpcm =
-        Entry{SongOpCode::None, Instrument::Silence};
-  }
+  clear();
   {
     ScopedBank scopedBank(GET_BANK(instrument_list));
     for (u8 i = 0; i < MAX_CHANNELS; i++) {
@@ -55,6 +52,13 @@ Maestro::Maestro() {
   }
   speed = 6; // TODO custom speed
 };
+
+void Maestro::clear() {
+  for (auto &row : rows) {
+    row.square1 = row.square2 = row.triangle = row.noise = row.dpcm =
+        Entry{SongOpCode::None, Instrument::Silence};
+  }
+}
 
 void Maestro::update_streams() {
   for (GGSound::Channel channel : (GGSound::Channel[]){
@@ -130,4 +134,16 @@ void Maestro::dynamic_sfx(GGSound::Channel channel, SongOpCode note,
   sfx_frame[(u8)channel][3] = (u8)note;
   sfx_frame[(u8)channel][2] = (u8)instrument;
   banked_play_sfx((SFX)channel, GGSound::SFXPriority::Two);
+}
+
+void Maestro::slower() {
+  if (speed < 12) {
+    speed++;
+  }
+}
+
+void Maestro::faster() {
+  if (speed > 1) {
+    speed--;
+  }
 }

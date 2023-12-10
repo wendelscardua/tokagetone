@@ -199,6 +199,9 @@ public:
   u8 speed;
   Maestro();
 
+  void slower();
+  void faster();
+  void clear();
   void update_streams();
   void dynamic_sfx(GGSound::Channel channel, SongOpCode note,
                    Instrument instrument);

@@ -43,6 +43,7 @@ class MusicEditor {
 
   u8 note_alt_sprite_timer;
 
+  void reset_editor();
   void render_sprites(s16 cursor_x, u8 cursor_y, s16 playing_x);
   void play_note();
   void load_strip(s16 strip, bool force);
@@ -50,6 +51,8 @@ class MusicEditor {
   void menu_handler(u8 pressed);
   void save_handler(u8 pressed);
   void load_handler(u8 pressed);
+  void stop_music();
+  void play_music();
 
 public:
   MusicEditor(Maestro &maestro);
