@@ -180,6 +180,216 @@ const u8 note_height[] = {
     0x10, // B7
 };
 
+const u8 octaveless_note[] = {
+    0x00, // C0
+    0x01, // CS0
+    0x02, // D0
+    0x03, // DS0
+    0x04, // E0
+    0x05, // F0
+    0x06, // FS0
+    0x07, // G0
+    0x08, // GS0
+    0x09, // A0
+    0x0a, // AS0
+    0x0b, // B0
+    0x00, // C1
+    0x01, // CS1
+    0x02, // D1
+    0x03, // DS1
+    0x04, // E1
+    0x05, // F1
+    0x06, // FS1
+    0x07, // G1
+    0x08, // GS1
+    0x09, // A1
+    0x0a, // AS1
+    0x0b, // B1
+    0x00, // C2
+    0x01, // CS2
+    0x02, // D2
+    0x03, // DS2
+    0x04, // E2
+    0x05, // F2
+    0x06, // FS2
+    0x07, // G2
+    0x08, // GS2
+    0x09, // A2
+    0x0a, // AS2
+    0x0b, // B2
+    0x00, // C3
+    0x01, // CS3
+    0x02, // D3
+    0x03, // DS3
+    0x04, // E3
+    0x05, // F3
+    0x06, // FS3
+    0x07, // G3
+    0x08, // GS3
+    0x09, // A3
+    0x0a, // AS3
+    0x0b, // B3
+    0x00, // C4
+    0x01, // CS4
+    0x02, // D4
+    0x03, // DS4
+    0x04, // E4
+    0x05, // F4
+    0x06, // FS4
+    0x07, // G4
+    0x08, // GS4
+    0x09, // A4
+    0x0a, // AS4
+    0x0b, // B4
+    0x00, // C5
+    0x01, // CS5
+    0x02, // D5
+    0x03, // DS5
+    0x04, // E5
+    0x05, // F5
+    0x06, // FS5
+    0x07, // G5
+    0x08, // GS5
+    0x09, // A5
+    0x0a, // AS5
+    0x0b, // B5
+    0x00, // C6
+    0x01, // CS6
+    0x02, // D6
+    0x03, // DS6
+    0x04, // E6
+    0x05, // F6
+    0x06, // FS6
+    0x07, // G6
+    0x08, // GS6
+    0x09, // A6
+    0x0a, // AS6
+    0x0b, // B6
+    0x00, // C7
+    0x01, // CS7
+    0x02, // D7
+    0x03, // DS7
+    0x04, // E7
+    0x05, // F7
+    0x06, // FS7
+    0x07, // G7
+    0x08, // GS7
+    0x09, // A7
+    0x0a, // AS7
+    0x0b, // B7
+};
+
+const u8 note_octave[] = {
+    0x00, // C0
+    0x00, // CS0
+    0x00, // D0
+    0x00, // DS0
+    0x00, // E0
+    0x00, // F0
+    0x00, // FS0
+    0x00, // G0
+    0x00, // GS0
+    0x00, // A0
+    0x00, // AS0
+    0x00, // B0
+    0x01, // C1
+    0x01, // CS1
+    0x01, // D1
+    0x01, // DS1
+    0x01, // E1
+    0x01, // F1
+    0x01, // FS1
+    0x01, // G1
+    0x01, // GS1
+    0x01, // A1
+    0x01, // AS1
+    0x01, // B1
+    0x02, // C2
+    0x02, // CS2
+    0x02, // D2
+    0x02, // DS2
+    0x02, // E2
+    0x02, // F2
+    0x02, // FS2
+    0x02, // G2
+    0x02, // GS2
+    0x02, // A2
+    0x02, // AS2
+    0x02, // B2
+    0x03, // C3
+    0x03, // CS3
+    0x03, // D3
+    0x03, // DS3
+    0x03, // E3
+    0x03, // F3
+    0x03, // FS3
+    0x03, // G3
+    0x03, // GS3
+    0x03, // A3
+    0x03, // AS3
+    0x03, // B3
+    0x04, // C4
+    0x04, // CS4
+    0x04, // D4
+    0x04, // DS4
+    0x04, // E4
+    0x04, // F4
+    0x04, // FS4
+    0x04, // G4
+    0x04, // GS4
+    0x04, // A4
+    0x04, // AS4
+    0x04, // B4
+    0x05, // C5
+    0x05, // CS5
+    0x05, // D5
+    0x05, // DS5
+    0x05, // E5
+    0x05, // F5
+    0x05, // FS5
+    0x05, // G5
+    0x05, // GS5
+    0x05, // A5
+    0x05, // AS5
+    0x05, // B5
+    0x06, // C6
+    0x06, // CS6
+    0x06, // D6
+    0x06, // DS6
+    0x06, // E6
+    0x06, // F6
+    0x06, // FS6
+    0x06, // G6
+    0x06, // GS6
+    0x06, // A6
+    0x06, // AS6
+    0x06, // B6
+    0x07, // C7
+    0x07, // CS7
+    0x07, // D7
+    0x07, // DS7
+    0x07, // E7
+    0x07, // F7
+    0x07, // FS7
+    0x07, // G7
+    0x07, // GS7
+    0x07, // A7
+    0x07, // AS7
+    0x07, // B7
+};
+
+const void *note_metasprites[] = {
+    metasprite_note_c,  metasprite_note_cs, metasprite_note_d,
+    metasprite_note_ds, metasprite_note_e,  metasprite_note_f,
+    metasprite_note_fs, metasprite_note_g,  metasprite_note_gs,
+    metasprite_note_a,  metasprite_note_as, metasprite_note_b,
+};
+
+const void *octave_metasprites[] = {
+    metasprite_oct0, metasprite_oct1, metasprite_oct2, metasprite_oct3,
+    metasprite_oct4, metasprite_oct5, metasprite_oct6, metasprite_oct7,
+};
+
 const u8 menu_option_x_coords[] = {0x20, 0x40, 0x50, 0x60, 0x80, 0xd0};
 const u8 speed_x_coords[] = {0xa0 + 0 * 3, 0xa0 + 1 * 3,  0xa0 + 2 * 3,
                              0xa0 + 3 * 3, 0xa0 + 4 * 3,  0xa0 + 5 * 3,
@@ -523,6 +733,12 @@ void MusicEditor::render_sprites(s16 cursor_x, u8 cursor_y, s16 playing_x) {
     banked_oam_meta_spr_horizontal(cursor_x - Camera::x, cursor_y, metasprite);
     banked_oam_meta_spr_horizontal(speed_x_coords[12 - maestro.speed], 0xdf,
                                    metasprite_speed_cursor);
+    banked_oam_meta_spr_horizontal(
+        cursor_x - Camera::x + 24, cursor_y,
+        note_metasprites[octaveless_note[(u8)note[(u8)current_channel]]]);
+    banked_oam_meta_spr_horizontal(
+        cursor_x - Camera::x + 24, cursor_y + 8,
+        octave_metasprites[note_octave[(u8)note[(u8)current_channel]]]);
 
   } break;
   case EditorMode::Menu:
