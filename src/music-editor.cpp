@@ -19,7 +19,7 @@ MusicEditor::MusicEditor(Maestro &maestro)
       note{SongOpCode::C3, SongOpCode::C3, SongOpCode::C4, (SongOpCode)0x00,
            SongOpCode::C3},
       instrument_index{0, 0, 0, 0, 0}, is_playing(false), playing_row(0),
-      playing_step_counter(0) {
+      playing_step_counter(0), note_alt_sprite_timer(0) {
   load_music_editor_assets();
 
   pal_bright(0);
@@ -317,6 +317,10 @@ void MusicEditor::loop() {
 
     render_sprites(cursor_x, cursor_y, playing_x);
 
+    if (note_alt_sprite_timer > 0) {
+      note_alt_sprite_timer--;
+    }
+
     if (is_playing) {
       playing_step_counter++;
       if (playing_step_counter >= 6) {
@@ -334,25 +338,34 @@ void MusicEditor::play_note() {
   maestro.dynamic_sfx(
       current_channel, note[(u8)current_channel],
       instruments[(u8)current_channel][instrument_index[(u8)current_channel]]);
+  note_alt_sprite_timer = 16;
 }
 
 void MusicEditor::render_sprites(s16 cursor_x, u8 cursor_y, s16 playing_x) {
   void *metasprite;
   switch (current_channel) {
   case GGSound::Channel::Square_1:
-    metasprite = (void *)metasprite_square1_cursor;
+    metasprite = note_alt_sprite_timer > 0
+                     ? (void *)metasprite_square1_cursor_alt
+                     : (void *)metasprite_square1_cursor;
     break;
   case GGSound::Channel::Square_2:
-    metasprite = (void *)metasprite_square2_cursor;
+    metasprite = note_alt_sprite_timer > 0
+                     ? (void *)metasprite_square2_cursor_alt
+                     : (void *)metasprite_square2_cursor;
     break;
   case GGSound::Channel::Triangle:
-    metasprite = (void *)metasprite_triangle_cursor;
+    metasprite = note_alt_sprite_timer > 0
+                     ? (void *)metasprite_triangle_cursor_alt
+                     : (void *)metasprite_triangle_cursor;
     break;
   case GGSound::Channel::Noise:
-    metasprite = (void *)metasprite_noise_cursor;
+    metasprite = note_alt_sprite_timer > 0 ? (void *)metasprite_noise_cursor_alt
+                                           : (void *)metasprite_noise_cursor;
     break;
   case GGSound::Channel::DPCM:
-    metasprite = (void *)metasprite_dpcm_cursor;
+    metasprite = note_alt_sprite_timer > 0 ? (void *)metasprite_dpcm_cursor_alt
+                                           : (void *)metasprite_dpcm_cursor;
     break;
   }
   banked_oam_meta_spr_horizontal(cursor_x - Camera::x, cursor_y, metasprite);

@@ -22,6 +22,8 @@ class MusicEditor {
   u8 playing_row;
   u8 playing_step_counter;
 
+  u8 note_alt_sprite_timer;
+
   void render_sprites(s16 cursor_x, u8 cursor_y, s16 playing_x);
   void play_note();
   void load_strip(s16 strip, bool force);
