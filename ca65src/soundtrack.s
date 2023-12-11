@@ -136,13 +136,6 @@
         sfx_frame_template:
         .byte SL8,STI,0,C3,RET
 
-        .global lalala_square1_frame
-        lalala_square1_frame = _Lalala_square1_0
-        .global lalala_square2_frame
-        lalala_square2_frame = _Lalala_square2_0
-        .global lalala_triangle_frame   
-        lalala_triangle_frame = _Lalala_triangle_0
-        .global lalala_noise_frame             
-        lalala_noise_frame = _Lalala_noise_0
-        .global lalala_dpcm_frame
-        lalala_dpcm_frame = _Lalala_dpcm_0
+        .global lalala_saved
+        lalala_saved:
+        .include "lalala.inc"
