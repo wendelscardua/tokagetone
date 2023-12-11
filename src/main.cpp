@@ -46,7 +46,7 @@ int main() {
   while (true) {
     switch (current_game_state) {
     case GameState::TitleScreen: {
-      TitleScreen title_screen;
+      TitleScreen title_screen{maestro};
       title_screen.loop();
     } break;
     case GameState::MusicEditor: {

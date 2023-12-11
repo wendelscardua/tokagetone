@@ -218,3 +218,22 @@ void Maestro::load(u8 slot) {
   }
   speed = save_speeds[slot];
 }
+
+void Maestro::load_title() {
+  ScopedBank scoped_bank(GET_BANK(instrument_list));
+  extern const u8 lalala_square1_frame[];
+  extern const u8 lalala_square2_frame[];
+  extern const u8 lalala_triangle_frame[];
+  extern const u8 lalala_noise_frame[];
+  extern const u8 lalala_dpcm_frame[];
+  memcpy((void *)frame[(u8)GGSound::Channel::Square_1], lalala_square1_frame,
+         Maestro::MAX_INSTRUCTIONS);
+  memcpy((void *)frame[(u8)GGSound::Channel::Square_2], lalala_square2_frame,
+         Maestro::MAX_INSTRUCTIONS);
+  memcpy((void *)frame[(u8)GGSound::Channel::Triangle], lalala_triangle_frame,
+         Maestro::MAX_INSTRUCTIONS);
+  memcpy((void *)frame[(u8)GGSound::Channel::Noise], lalala_noise_frame,
+         Maestro::MAX_INSTRUCTIONS);
+  memcpy((void *)frame[(u8)GGSound::Channel::DPCM], lalala_dpcm_frame,
+         Maestro::MAX_INSTRUCTIONS);
+};

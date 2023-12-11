@@ -1,8 +1,9 @@
 #pragma once
 
+#include "maestro.hpp"
 class TitleScreen {
 public:
-  TitleScreen();
+  TitleScreen(Maestro &maestro);
   ~TitleScreen();
   void loop();
 };

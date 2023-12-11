@@ -216,6 +216,7 @@ public:
   void clear();
   void save(u8 slot);
   void load(u8 slot);
+  void load_title();
   void update_streams();
   void dynamic_sfx(GGSound::Channel channel, SongOpCode note,
                    Instrument instrument);
